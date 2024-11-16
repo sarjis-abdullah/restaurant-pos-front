@@ -1,10 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   runtimeConfig: {
-    BASE_URL: process.env.BASE_URL,
+    DEVELOPMENT_API_URL: process.env.DEVELOPMENT_API_URL,
     APP_URL: process.env.APP_URL,
     public: {
-      BASE_URL: process.env.BASE_URL,
+      DEVELOPMENT_API_URL: process.env.DEVELOPMENT_API_URL,
       APP_URL: process.env.APP_URL,
       apiBase: "", // can be overridden by NUXT_PUBLIC_API_BASE environment variable
     },

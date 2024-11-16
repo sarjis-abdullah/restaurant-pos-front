@@ -15,11 +15,11 @@ export class HttpRequester extends BaseHttpRequester {
     try {
       const req = {
         ...this.getHeaders(),
-      }
+      };
       if (!auth) {
         // delete req.headers.Authorization
       }
-      const response = await fetch(this.BASE_URL + url, req);
+      const response = await fetch(this.DEVELOPMENT_API_URL + url, req);
       if (response.ok) {
         return await response.json();
       } else {
@@ -30,16 +30,23 @@ export class HttpRequester extends BaseHttpRequester {
       throw error;
     }
   }
-  static async post(url, data) {
+  static async post(url, data, auth = true, fn = "") {
     try {
-      const response = await fetch(this.BASE_URL + url, {
+      const req = {
         method: "POST",
         ...this.getHeaders(),
         body: JSON.stringify(data),
-      });
+      };
+      if (!auth) {
+        delete req.headers.Authorization;
+      }
+      const response = await fetch(this.DEVELOPMENT_API_URL + url, req);
+
       if (response.ok) {
         const res = await response.json();
-        this.handleMessage("Entry created successfully.");
+        if (fn == "") {
+          this.handleMessage("Entry created successfully.");
+        }
         return res;
       } else {
         const responseBody = await response.text(); // Get response body as text
@@ -63,12 +70,12 @@ export class HttpRequester extends BaseHttpRequester {
         method: "PUT",
         ...this.getHeaders(),
         body: JSON.stringify(data),
-      }
+      };
       if (!auth) {
-        delete req.headers.Authorization
+        delete req.headers.Authorization;
       }
-      console.log(req, 'reque');
-      const response = await fetch(this.BASE_URL + url, req);
+      console.log(req, "reque");
+      const response = await fetch(this.DEVELOPMENT_API_URL + url, req);
       if (response.ok) {
         const res = await response.json();
         this.handleMessage("Entry updated successfully.");
@@ -91,7 +98,7 @@ export class HttpRequester extends BaseHttpRequester {
   }
   static async delete(url) {
     try {
-      const response = await fetch(this.BASE_URL + url, {
+      const response = await fetch(this.DEVELOPMENT_API_URL + url, {
         method: "DELETE",
         ...this.getHeaders(),
       });
@@ -142,7 +149,7 @@ export class HttpRequester extends BaseHttpRequester {
     } else this.handleMessage("Something went wrong!", false);
   }
   static async getFile(url) {
-    const response = await fetch(this.BASE_URL + url, {
+    const response = await fetch(this.DEVELOPMENT_API_URL + url, {
       headers: this.getHeaders(),
     });
     if (response.ok) {

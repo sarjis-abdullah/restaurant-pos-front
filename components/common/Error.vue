@@ -1,9 +1,9 @@
 <template>
   <ul>
     <li v-for="item in error" :key="item">
-      <span class="text-red-500">
+      <div class="text-red-500">
         -{{ item?.length ? item.toString() : '' }}
-      </span>
+      </div>
     </li>
   </ul>
 </template>

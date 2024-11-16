@@ -473,7 +473,7 @@ const handlePerpageChange = () => {
   // loadData();
 };
 const config = useRuntimeConfig();
-const BASE_API_URL = config.public.BASE_URL;
+const BASE_API_URL = config.public.DEVELOPMENT_API_URL;
 const routeName = computed(() => router);
 const paymentIds = computed(() => selected.value?.map((i) => i.id).join(","));
 // const qrCodeUrl = computed(() => url + route.href);

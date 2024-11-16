@@ -16,6 +16,13 @@ export class UserService {
       throw err;
     }
   }
+  static async login(data) {
+    try {
+      return await HttpRequester.post('login', data, false, 'login');
+    } catch (err) {
+      throw err;
+    }
+  }
   static async delete(id) {
     try {
       return await HttpRequester.delete('user/' + id);

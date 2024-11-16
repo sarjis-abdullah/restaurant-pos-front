@@ -1,7 +1,7 @@
 <template>
-    <span class="text-red-500" v-for="(err, index) in errors" :key="index">
+    <div class="text-red-500" v-for="(err, index) in errors" :key="index">
     {{ err?.$message }}
-  </span>
+  </div>
 </template>
 
 <script setup>

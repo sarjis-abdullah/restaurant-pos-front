@@ -6,6 +6,7 @@ import { email, required, sameAs, helpers } from "@vuelidate/validators";
 import { UserService } from "@/services/UserService.js";
 import ClientErrors from "@/components/common/ClientErrors.vue";
 import ServerError from "@/components/common/Error.vue";
+import BaseInput from "@/components/common/BaseInput.vue";
 
 definePageMeta({
   layout: "auth-layout",
@@ -79,7 +80,7 @@ const inputClass =
 <template>
   <section class="max-w-2xl rounded-lg bg-slate-[#A8A8A8] shadow-lg p-6">
     <header class="hidden md:flex justify-between text-gray-900 mb-3 text-xl">
-      <h6 class="hidden md:inline-block capitalize">{{ 'Add User' }}</h6>
+      <h6 class="hidden md:inline-block capitalize">{{ "Add User" }}</h6>
     </header>
     <form @submit.prevent="onSubmit" ref="formRef" class="grid gap-3">
       <section class="grid grid-cols-1 gap-3">
@@ -87,12 +88,13 @@ const inputClass =
           <label class="text-gray-500"
             >Name<span class="text-red-500">*</span></label
           >
-          <input
+          <BaseInput v-model="state.name" placeholder="e.g. John Doe" />
+          <!-- <input
             :class="inputClass"
             v-model="state.name"
             type="text"
             placeholder="e.g. John Doe"
-          />
+          /> -->
         </div>
         <div class="grid gap-2">
           <label class="text-gray-500"

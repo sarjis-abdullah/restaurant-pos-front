@@ -329,7 +329,7 @@ const payDUe = async () => {
   }
 };
 const config = useRuntimeConfig();
-const url = config.public.BASE_URL;
+const url = config.public.DEVELOPMENT_API_URL;
 const qrCodeUrl = ref("");
 const scanToPay = (title) => {
   const paymentId = singleData.payment.id;
