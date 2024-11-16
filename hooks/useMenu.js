@@ -71,7 +71,7 @@ export const useMenu = () => {
   }
   const state = reactive({
     menuItems: !authUser.value ? [] : operator.value?.name ? [cashflow, parking] : [
-      { name: "Dashboard", href: "/dashboard", icon: HomeIcon, show: false },
+      // { name: "Dashboard", href: "/dashboard", icon: HomeIcon, show: false },
       {
         name: "User",
         href: "/user",
@@ -82,16 +82,7 @@ export const useMenu = () => {
           { name: "List", href: "/user", icon: TableCellsIcon },
         ],
       },
-      {
-        name: "Place",
-        href: "/place",
-        icon: BuildingOfficeIcon,
-        show: false,
-        children: [
-          { name: "Add", href: "/add/place", icon: PlusIcon },
-          { name: "List", href: "/place", icon: TableCellsIcon },
-        ],
-      },
+      
       
       {
         name: "Floor",
@@ -103,68 +94,23 @@ export const useMenu = () => {
           { name: "List", href: "/floor", icon: TableCellsIcon },
         ],
       },
-      {
-        name: "Block",
-        href: "/block",
-        icon: shallowRef(FloorIcon),
-        show: false,
-        children: [
-          { name: "Add", href: "/add/block", icon: PlusIcon },
-          { name: "List", href: "/block", icon: TableCellsIcon },
-        ],
-      },
       
-      {
-        name: "Slot",
-        href: "/slot",
-        icon: shallowRef(SlotIcon),
-        show: false,
-        children: [
-          { name: "Add", href: "/add/slot", icon: PlusIcon },
-          { name: "List", href: "/slot", icon: TableCellsIcon },
-        ],
-      },
-      {
-        name: "Category",
-        href: "/category",
-        icon: shallowRef(CategoryIcon),
-        svg: true,
-        show: false,
-        children: [
-          { name: "Add", href: "/add/category", icon: PlusIcon },
-          { name: "List", href: "/category", icon: TableCellsIcon },
-        ],
-      },
-      {
-        name: "Tariff",
-        href: "/tariff",
-        icon: shallowRef(TariffIcon),
-        show: false,
-        children: [
-          { name: "Add", href: "/add/tariff", icon: PlusIcon },
-          { name: "List", href: "/tariff", icon: TableCellsIcon },
-        ],
-      },
-      {
-        name: "Member type",
-        href: "/membership",
-        imageIcon: memberTypeIcon,
-        show: false,
-        children: [
-          { name: "Add", href: "/add/membership-type", icon: PlusIcon },
-          { name: "List", href: "/membership-type", icon: TableCellsIcon },
-        ],
-      },
-      {
-        name: "Membership",
-        href: "/membership",
-        icon: shallowRef(UserGroupIcon),
-        show: false,
-        // children: [
-        //   // { name: "Add", href: "/add/membership", icon: PlusIcon },
-        //   { name: "List", href: "/membership", icon: TableCellsIcon },
-        // ],
-      },
+      // {
+      //   name: "Member type",
+      //   href: "/membership",
+      //   imageIcon: memberTypeIcon,
+      //   show: false,
+      //   children: [
+      //     { name: "Add", href: "/add/membership-type", icon: PlusIcon },
+      //     { name: "List", href: "/membership-type", icon: TableCellsIcon },
+      //   ],
+      // },
+      // {
+      //   name: "Membership",
+      //   href: "/membership",
+      //   icon: shallowRef(UserGroupIcon),
+      //   show: false,
+      // },
       {
         name: "Discount",
         href: "/discount",
@@ -176,18 +122,18 @@ export const useMenu = () => {
           { name: "List", href: "/discount", icon: TableCellsIcon },
         ],
       },
-      parking,
-      {
-        name: "Reporting",
-        href: "/reporting",
-        // icon: shallowRef(ParkingIcon),
-        imageIcon: reportIcon,
-        show: false,
-        children: [
-          { name: "Transaction reports", href: "/transaction-reports", icon: PlusIcon },
-          { name: "Vehicle reports", href: "/vehicle-reports", icon: TableCellsIcon },
-        ],
-      },
+      // parking,
+      // {
+      //   name: "Reporting",
+      //   href: "/reporting",
+      //   // icon: shallowRef(ParkingIcon),
+      //   imageIcon: reportIcon,
+      //   show: false,
+      //   children: [
+      //     { name: "Transaction reports", href: "/transaction-reports", icon: PlusIcon },
+      //     { name: "Vehicle reports", href: "/vehicle-reports", icon: TableCellsIcon },
+      //   ],
+      // },
       cashflow
       // {
       //   name: "Reports",

@@ -87,7 +87,7 @@ const loginUser = async () => {
     if (data.user && window && window.localStorage) {
       localStorage.setItem("LOGIN_ACCOUNT", JSON.stringify(data.user));
       localStorage.setItem("ACCESS_TOKEN", data.accessToken);
-      router.push("/dashboard");
+      router.push("/user");
       // if (data.user?.roles?.find((item) => item?.name == "operator")) {
       //   router.push("/cashflow");
       // } else router.push("/dashboard");

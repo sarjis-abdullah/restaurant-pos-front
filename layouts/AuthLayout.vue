@@ -172,16 +172,16 @@
             >
               <div @click.prevent="toggleMenu(index)" class="flex gap-2">
                 <!-- Use the icon dynamically -->
-                 <img v-if="item.imageIcon" :src="item.imageIcon" class="h-6 w-6"/>
+                 <!-- <img v-if="item.imageIcon" :src="item.imageIcon" class="h-6 w-6"/>
                 <component
                 v-else
                   class="h-6 w-6 shrink-0 text-[#3591ca] group-hover:text-indigo-600"
                   :is="item.icon"
-                ></component>
-                <nuxt-link v-if="!item?.children?.length" :to="item.href">{{
+                ></component> -->
+                <nuxt-link :class="item.show && item.children ? 'text-indigo-500 font-bold' : ''" v-if="!item?.children?.length" :to="item.href">{{
                   item.name
                 }}</nuxt-link>
-                <span v-else>{{ item.name }}</span>
+                <span v-else :class="item.show && item.children ? 'text-indigo-500 font-bold' : ''">{{ item.name }}</span>
               </div>
               <ul v-if="item.show && item.children" class="ml-4 mt-2">
                 <li
