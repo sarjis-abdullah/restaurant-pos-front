@@ -33,7 +33,7 @@ const total = ref(null);
 const totalPerPage = ref(null);
 
 const searchQuery = computed(() => {
-  return `?page=${page.value}&per_page=${perPage.value}&include=f.place`;
+  return `?page=${page.value}&per_page=${perPage.value}&include=b.branch`;
 });
 
 const loadData = async () => {
@@ -167,17 +167,17 @@ onMounted(() => {
                   >
                     Name
                   </th>
-                  <th
+                  <!-- <th
                     scope="col"
                     class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
                     Remarks
-                  </th>
+                  </th> -->
                   <th
                     scope="col"
                     class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Place
+                    Branch
                   </th>
                   <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
                     Action
@@ -206,7 +206,7 @@ onMounted(() => {
                       </div>
                     </div>
                   </td>
-                  <td class="whitespace-nowrap px-3 py-5 text-sm">
+                  <!-- <td class="whitespace-nowrap px-3 py-5 text-sm">
                     <div v-if="singleData.editMode" class="mt-1 text-gray-500">
                       <input
                         :class="inputClass"
@@ -216,9 +216,9 @@ onMounted(() => {
                       />
                     </div>
                     <span class="text-gray-900">{{ singleData.remarks }}</span>
-                  </td>
+                  </td> -->
                   <td class="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
-                    {{ singleData?.place?.name }}
+                    {{ singleData?.branch?.name }}
                   </td>
                   <td
                     class="flex justify-center gap-1 relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"

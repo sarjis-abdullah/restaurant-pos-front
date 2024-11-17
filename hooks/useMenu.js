@@ -75,19 +75,24 @@ export const useMenu = () => {
       {
         name: "User",
         href: "/user",
-        icon: UsersIcon,
         show: false,
         children: [
           { name: "Add", href: "/add/user", icon: PlusIcon },
           { name: "List", href: "/user", icon: TableCellsIcon },
         ],
       },
-      
-      
+      {
+        name: "Branch",
+        href: "/branch",
+        show: false,
+        children: [
+          { name: "Add", href: "/add/branch", icon: PlusIcon },
+          { name: "List", href: "/branch", icon: TableCellsIcon },
+        ],
+      },
       {
         name: "Floor",
         href: "/floor",
-        icon: shallowRef(FloorIcon),
         show: false,
         children: [
           { name: "Add", href: "/add/floor", icon: PlusIcon },
@@ -114,8 +119,6 @@ export const useMenu = () => {
       {
         name: "Discount",
         href: "/discount",
-        icon: shallowRef(UserGroupIcon),
-        imageIcon: customerPointsIcon,
         show: false,
         children: [
           { name: "Add", href: "/add/discount", icon: PlusIcon },

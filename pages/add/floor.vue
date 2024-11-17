@@ -1,30 +1,28 @@
 <script setup>
-import AuthLayout from "../layouts/AuthLayout.vue";
-import ErrorMessage from "../components/common/ErrorMessage.vue";
 import { ref, reactive, onMounted } from "vue";
 const formRef = ref(null);
 import { useVuelidate } from "@vuelidate/core";
 import { email, required, sameAs, helpers } from "@vuelidate/validators";
-import { PlaceService } from "@/services/PlaceService.js";
+import { BranchService } from "@/services/BranchService.js";
 import { FloorService } from "@/services/FloorService.js";
 import ClientErrors from "@/components/common/ClientErrors.vue";
 import ServerError from "@/components/common/Error.vue";
+import BaseInput from "@/components/common/BaseInput.vue";
+import SpinnerButton from "~/components/common/SpinnerButton.vue";
 
 definePageMeta({
   layout: "auth-layout",
 });
 const defaultData = {
   name: "",
-  place: "",
-  remarks: "",
+  branch: "",
 };
 const serverErrors = ref({});
 const state = reactive(defaultData);
 const rules = computed(() => {
   return {
     name: { required: helpers.withMessage("Name is required", required) },
-    place: { required: helpers.withMessage("Place is required", required) },
-    remarks: {},
+    branch: { required: helpers.withMessage("Branch is required", required) },
   };
 });
 const validator = useVuelidate(rules, state, { $lazy: true });
@@ -42,8 +40,8 @@ const handleReset = async () => {
 const postItem = async () => {
   try {
     loading.value = true;
-    const obj = { ...state, place_id: state.place };
-    delete obj.place;
+    const obj = { ...state, branch_id: state.branch };
+    delete obj.branch;
     await FloorService.create(obj);
     serverErrors.value = {};
     handleReset();
@@ -65,13 +63,13 @@ const onSubmit = async () => {
     console.log("Please fillup the form!");
   }
 };
-const places = ref([]);
-const getPlaces = async () => {
-  const { data } = await PlaceService.getAll("");
-  places.value = data;
+const branches = ref([]);
+const getBranches = async () => {
+  const { data } = await BranchService.getAll("");
+  branches.value = data;
 };
 onMounted(() => {
-  getPlaces();
+  getBranches();
 });
 
 const inputClass =
@@ -89,8 +87,7 @@ const inputClass =
           <label class="text-gray-500">
             Name<span class="text-red-500">*</span>
           </label>
-          <input
-            :class="inputClass"
+          <BaseInput
             v-model="state.name"
             type="text"
             placeholder="e.g. Ground/Basement floor"
@@ -99,33 +96,21 @@ const inputClass =
         </div>
         <div class="grid gap-2">
           <label class="text-gray-500">
-            Place<span class="text-red-500">*</span>
+            Branch<span class="text-red-500">*</span>
           </label>
           <select
             class="focus:outline-none bg-none"
             :class="inputClass"
             style="background: none"
-            name="place"
-            v-model="state.place"
-            :key="state.place"
+            name="branch"
+            v-model="state.branch"
+            :key="state.branch"
           >
-            <option disabled :value="''">Select place name</option>
-            <option v-for="place in places" :key="place.id" :value="place.id">
-              {{ place.name }}
+            <option disabled :value="''">Select branch name</option>
+            <option v-for="branch in branches" :key="branch.id" :value="branch.id">
+              {{ branch.name }}
             </option>
-            <!-- Add more options as needed -->
           </select>
-          <!-- <ServerErrorMessage :errors="validator.place.$errors" /> -->
-        </div>
-        <div class="grid gap-2">
-          <label class="text-gray-500">Remarks</label>
-          <input
-            :class="inputClass"
-            v-model="state.remarks"
-            type="text"
-            placeholder="e.g. remarks"
-          />
-          <!-- <ServerErrorMessage :errors="validator.remarks.$errors" /> -->
         </div>
       </section>
       <ServerError :error="serverErrors" />
@@ -139,13 +124,11 @@ const inputClass =
           >
             Reset
           </button>
-          <button
+          <SpinnerButton
             type="submit"
-            :disabled="loading"
-            class="bg-indigo-600 text-white px-2 py-1 rounded-md"
+            :loading="loading"
           >
-            {{ loading ? "Processing" : "Submit" }}
-          </button>
+          </SpinnerButton>
         </div>
       </section>
     </form>
