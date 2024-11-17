@@ -91,6 +91,15 @@ export const useMenu = () => {
         ],
       },
       {
+        name: "Category",
+        href: "/category",
+        show: false,
+        children: [
+          { name: "Add", href: "/add/category", icon: PlusIcon },
+          { name: "List", href: "/category", icon: TableCellsIcon },
+        ],
+      },
+      {
         name: "Floor",
         href: "/floor",
         show: false,

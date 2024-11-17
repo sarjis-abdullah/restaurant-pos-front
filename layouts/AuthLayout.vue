@@ -178,10 +178,10 @@
                   class="h-6 w-6 shrink-0 text-[#3591ca] group-hover:text-indigo-600"
                   :is="item.icon"
                 ></component> -->
-                <nuxt-link :class="item.show && item.children ? 'text-indigo-500 font-bold' : ''" v-if="!item?.children?.length" :to="item.href">{{
+                <nuxt-link :class="item.show && item.children ? 'text-brand-400 font-bold' : ''" v-if="!item?.children?.length" :to="item.href">{{
                   item.name
                 }}</nuxt-link>
-                <span v-else :class="item.show && item.children ? 'text-indigo-500 font-bold' : ''">{{ item.name }}</span>
+                <span v-else :class="item.show && item.children ? 'text-brand-400 font-bold' : ''">{{ item.name }}</span>
               </div>
               <ul v-if="item.show && item.children" class="ml-4 mt-2">
                 <li
@@ -195,7 +195,7 @@
                     :is="child.icon"
                   ></component>
 
-                  <nuxt-link :to="child.href">{{ child.name }}</nuxt-link>
+                  <nuxt-link :to="child.href" class="text-brand-400">{{ child.name }}</nuxt-link>
                 </li>
               </ul>
             </li>

@@ -7,6 +7,7 @@ import { UserService } from "@/services/UserService.js";
 import ClientErrors from "@/components/common/ClientErrors.vue";
 import ServerError from "@/components/common/Error.vue";
 import BaseInput from "@/components/common/BaseInput.vue";
+import SpinnerButton from "~/components/common/SpinnerButton.vue";
 
 definePageMeta({
   layout: "auth-layout",
@@ -168,13 +169,11 @@ const inputClass =
             >
               validate
             </button> -->
-          <button
+          <SpinnerButton
             type="submit"
-            :disabled="loading"
-            class="bg-indigo-600 text-white px-2 py-1 rounded-md"
+            :loading="loading"
           >
-            {{ loading ? "Processing" : "Submit" }}
-          </button>
+          </SpinnerButton>
         </div>
       </section>
     </form>

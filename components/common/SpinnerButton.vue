@@ -62,7 +62,7 @@ defineProps({
   },
   bgClass: {
     type: String,
-    default: "bg-blue-500 text-white hover:bg-blue-600",
+    default: "bg-brand-400 text-white hover:bg-brand-500",
   },
   extraClass: {
     type: String,
