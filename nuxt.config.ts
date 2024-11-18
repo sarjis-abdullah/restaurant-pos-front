@@ -20,9 +20,7 @@ export default defineNuxtConfig({
   nitro: {
     // plugins: ["~/server/index.js"],
   },
-  modules: [
-    'nuxt-particles'
-  ],
+  modules: ['@pinia/nuxt'],
   devServer: {
     // for check in mbl device
     port: 3000, // default: 3000
