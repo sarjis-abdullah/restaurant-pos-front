@@ -78,7 +78,7 @@ const categoryListLoading = ref(false)
 onMounted(async() => {
   // getPlaces();
   // categoryListLoading.value = true
-  // await categoryStore.fetchCategories()
+  // await categoryStore.fetchList()
   // categoryListLoading.value = false
 });
 
