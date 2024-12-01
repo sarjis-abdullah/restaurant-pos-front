@@ -1,7 +1,7 @@
 <template>
   <nuxt-link
     :to="to"
-    class="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600"
+    class="bg-brand-400 text-white hover:bg-brand-500 px-3 py-1 rounded"
   >
     <slot></slot>
   </nuxt-link>

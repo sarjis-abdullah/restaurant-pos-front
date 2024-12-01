@@ -143,6 +143,15 @@ export const useMenu = () => {
           { name: "List", href: "/tax", icon: TableCellsIcon },
         ],
       },
+      {
+        name: "Menu",
+        href: "/menu",
+        show: false,
+        children: [
+          { name: "Add", href: "/add/menu", icon: PlusIcon },
+          { name: "List", href: "/menu", icon: TableCellsIcon },
+        ],
+      },
       // parking,
       // {
       //   name: "Reporting",
