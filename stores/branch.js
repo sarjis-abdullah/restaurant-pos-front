@@ -8,12 +8,12 @@ export const useBranchStore = defineStore("branch", {
   }),
   getters: {
     // Example 3: Count of categories
-    categoryList(state) {
-      return state.categories;
+    branchList(state) {
+      return state.branches;
     },
   },
   actions: {
-    async fetchBranches() {
+    async fetchList() {
       try {
         const response = await BranchService.getAll("");
         this.branches = response.data || [];

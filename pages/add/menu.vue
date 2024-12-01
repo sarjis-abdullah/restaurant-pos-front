@@ -4,6 +4,7 @@ import ServerError from "@/components/common/Error.vue";
 import BaseInput from "@/components/common/BaseInput.vue";
 import BaseSelect from "@/components/common/BaseSelect.vue";
 import SpinnerButton from "@/components/common/SpinnerButton.vue";
+import SelectBranch from "@/components/branch/SelectBranch.vue";
 import { ref, reactive, onMounted } from "vue";
 const formRef = ref(null);
 import { useVuelidate } from "@vuelidate/core";
@@ -23,20 +24,20 @@ import { MenuService } from "~/services/MenuService";
 definePageMeta({
   layout: "auth-layout",
 });
-const HOURLY = "hourly";
+const AVAILABLE = "available";
+const UN_AVAILABLE = "unavailable";
 const HALF_HOURLY = "half_hourly";
 const defaultData = {
   branch: "",
   name: "",
-  status: "",
-  isActive: false,
+  status: AVAILABLE,
 };
 
 const serverErrors = ref({});
 const state = reactive({ ...defaultData });
 const rules = computed(() => {
   return {
-    name: { required: helpers.withMessage("Rate is required", required) },
+    name: { required: helpers.withMessage("Name is required", required) },
     branch: { required: helpers.withMessage("Branch is required", required) },
     status: { },
   };
@@ -44,28 +45,20 @@ const rules = computed(() => {
 const validator = useVuelidate(rules, state, { $lazy: true });
 
 const loading = ref(false);
-const getTodayDate = () => {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const day = String(today.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
 
 const handleReset = async () => {
   await validator.value.$reset();
   for (let key in state) {
     state[key] = defaultData[key];
   }
-  state.type = 'flat'
+  state.status = AVAILABLE
   serverErrors.value = {};
 };
 const discountData = computed(() => {
   return {
-    rate: state.rate,
-    type: state.type,
-    // is_active: state.isActive,
-    // promo_code: state.promoCode,
+    name: state.name,
+    branch_id: state.branch,
+    status: state.status,
   };
 });
 const postItem = async () => {
@@ -75,7 +68,7 @@ const postItem = async () => {
     
     serverErrors.value = {};
     handleReset();
-    state.paymentRateType = HALF_HOURLY;
+    state.status = AVAILABLE;
   } catch (error) {
     serverErrors.value = error.errors;
   } finally {
@@ -123,6 +116,10 @@ const inputClass =
             Name<span class="text-red-500">*</span>
           </label>
           <BaseInput v-model="state.name" placeholder="Menu name" />
+        </div>
+        <div class="grid gap-2">
+          <label class="text-gray-500">Select Branch</label>
+          <SelectBranch v-model="state.branch" />
         </div>
         <div class="grid gap-2">
           <label class="text-gray-500">Status</label>
