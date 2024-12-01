@@ -9,10 +9,16 @@ import { CategoryService } from "@/services/CategoryService.js";
 import { PlaceService } from "@/services/PlaceService.js";
 import ClientErrors from "@/components/common/ClientErrors.vue";
 import ServerError from "@/components/common/Error.vue";
+import { useCategoryStore } from '~/stores/category';
+import BaseInput from "@/components/common/BaseInput.vue";
+import SpinnerButton from "~/components/common/SpinnerButton.vue";
+import SelectBranch from "~/components/branch/SelectBranch.vue";
+import { useBranchStore } from '~/stores/branch';
 
 definePageMeta({
   layout: "auth-layout",
 });
+const categoryStore = useCategoryStore();
 const defaultData = {
   name: "",
   description: "",
@@ -22,10 +28,14 @@ const state = reactive(defaultData);
 const rules = computed(() => {
   return {
     name: { required: helpers.withMessage("Name is required", required) },
-    // place: { required: helpers.withMessage("Place is required", required) },
+    // branch: { required: helpers.withMessage("Branch is required", required) },
     description: {},
   };
 });
+const branchStore = useBranchStore();
+const selectedBranch = computed(()=> branchStore.selectedBranch);
+const state2 = reactive({...defaultData, branch: selectedBranch.value});
+
 const validator = useVuelidate(rules, state, { $lazy: true });
 
 const loading = ref(false);
@@ -63,8 +73,13 @@ const getPlaces = async () => {
   const { data } = await PlaceService.getAll("");
   places.value = data;
 };
-onMounted(() => {
-  getPlaces();
+const categoryList = computed(()=> categoryStore?.categoryList?.length ? categoryStore.categoryList : [])
+const categoryListLoading = ref(false)
+onMounted(async() => {
+  // getPlaces();
+  // categoryListLoading.value = true
+  // await categoryStore.fetchCategories()
+  // categoryListLoading.value = false
 });
 
 const inputClass =
@@ -88,19 +103,23 @@ const inputClass =
             type="text"
             placeholder="e.g. Car/Micro/Motor-cycle"
           />
-          <!-- <ServerErrorMessage :errors="validator.name.$errors" /> -->
         </div>
-
         <div class="grid gap-2">
-          <label class="text-gray-500">Description</label>
+          <label class="text-gray-500">
+            Name<span class="text-red-500">*</span>
+          </label>
           <input
             :class="inputClass"
-            v-model="state.description"
+            v-model="state.name"
             type="text"
-            placeholder="e.g. description"
+            placeholder="e.g. Car/Micro/Motor-cycle"
           />
-          <!-- <ServerErrorMessage :errors="validator.description.$errors" /> -->
         </div>
+
+        <!-- <div class="grid gap-2">
+          <label class="text-gray-500">Select Branch</label>
+          <SelectBranch />
+        </div> -->
       </section>
       <ServerError :error="serverErrors" />
       <ClientErrors :errors="validator.$errors" />
@@ -113,13 +132,11 @@ const inputClass =
           >
             Reset
           </button>
-          <button
+          <SpinnerButton
             type="submit"
-            :disabled="loading"
-            class="bg-indigo-600 text-white px-2 py-1 rounded-md"
+            :loading="loading"
           >
-            {{ loading ? "Processing" : "Submit" }}
-          </button>
+          </SpinnerButton>
         </div>
       </section>
     </form>

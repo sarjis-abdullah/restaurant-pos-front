@@ -1,9 +1,12 @@
 <template>
+  <span :class="customClass" v-if="loading">Loading...</span>
+
   <select
+    v-else
     :name="name"
     :class="['focus:outline-none bg-none', customClass]"
     :style="{ background: backgroundStyle }"
-    v-model="modelValue"
+    :value="modelValue"
     @change="onChange"
   >
     <option v-if="placeholder" :disabled="true" :value="optionDefaultValue">
@@ -11,10 +14,10 @@
     </option>
     <option
       v-for="option in options"
-      :key="option.id || option.value"
-      :value="option.value"
+      :key="option.id"
+      :value="option.id"
     >
-      {{ option.label }}
+      {{ option.name }}
     </option>
   </select>
 </template>
@@ -50,6 +53,10 @@ defineProps({
   backgroundStyle: {
     type: String,
     default: "none",
+  },
+  loading: {
+    type: Boolean,
+    default: true,
   },
 });
 

@@ -99,15 +99,15 @@ export const useMenu = () => {
           { name: "List", href: "/category", icon: TableCellsIcon },
         ],
       },
-      {
-        name: "Floor",
-        href: "/floor",
-        show: false,
-        children: [
-          { name: "Add", href: "/add/floor", icon: PlusIcon },
-          { name: "List", href: "/floor", icon: TableCellsIcon },
-        ],
-      },
+      // {
+      //   name: "Floor",
+      //   href: "/floor",
+      //   show: false,
+      //   children: [
+      //     { name: "Add", href: "/add/floor", icon: PlusIcon },
+      //     { name: "List", href: "/floor", icon: TableCellsIcon },
+      //   ],
+      // },
       
       // {
       //   name: "Member type",
