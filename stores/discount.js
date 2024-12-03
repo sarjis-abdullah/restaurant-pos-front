@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { DiscountService } from "~/services/DiscountService";
 
-export const useCategoryStore = defineStore("discount", {
+export const useDiscountStore = defineStore("discount", {
   state: () => ({
     items: [],
   }),
@@ -17,12 +17,15 @@ export const useCategoryStore = defineStore("discount", {
         const response = await DiscountService.getAll("");
 
         console.log(response.data, "response");
-        this.categories = response.data || [];
+        this.items = response.data || [];
       } catch (error) {
         console.error("Error fetching items:", error);
       } finally {
         this.loading = false;
       }
+    },
+    setSelectedItem(id) {
+      this.selectedItem = id;
     },
   },
 });

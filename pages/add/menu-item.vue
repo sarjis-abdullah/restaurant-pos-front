@@ -6,6 +6,9 @@ import BaseSelect from "@/components/common/BaseSelect.vue";
 import SpinnerButton from "@/components/common/SpinnerButton.vue";
 import SelectBranch from "@/components/branch/SelectBranch.vue";
 import SelectCategory from "@/components/category/SelectCategory.vue";
+import SelectTax from "@/components/tax/SelectTax.vue";
+import SelectDiscount from "@/components/discount/SelectDiscount.vue";
+import SelectMenu from "@/components/menu/SelectMenu.vue";
 import { ref, reactive, onMounted } from "vue";
 const formRef = ref(null);
 import { useVuelidate } from "@vuelidate/core";
@@ -20,7 +23,7 @@ import { PlaceService } from "@/services/PlaceService.js";
 import { SlotService } from "@/services/SlotService.js";
 import { CategoryService } from "~/services/CategoryService";
 import { TariffService } from "~/services/TariffService";
-import { MenuService } from "~/services/MenuService";
+import { MenuItemService } from "~/services/MenuItemService";
 
 definePageMeta({
   layout: "auth-layout",
@@ -32,6 +35,9 @@ const defaultData = {
   price: "",
   name: "",
   category: "",
+  tax: "",
+  discount: "",
+  menu: "",
   status: AVAILABLE,
 };
 
@@ -42,6 +48,9 @@ const rules = computed(() => {
     name: { required: helpers.withMessage("Name is required", required) },
     price: { required: helpers.withMessage("Price is required", required) },
     category: { required: helpers.withMessage("Category is required", required) },
+    tax: { required: helpers.withMessage("Tax is required", required) },
+    menu: { required: helpers.withMessage("Menu is required", required) },
+    discount: { required: helpers.withMessage("Discount is required", required) },
     status: { },
   };
 });
@@ -60,14 +69,19 @@ const handleReset = async () => {
 const discountData = computed(() => {
   return {
     name: state.name,
+    price: state.price,
     branch_id: state.branch,
-    status: state.status,
+    category_id: state.category,
+    discount_id: state.discount,
+    tax_id: state.tax,
+    menu_id: state.menu,
+    quantity: 1,
   };
 });
 const postItem = async () => {
   try {
     loading.value = true;
-    await MenuService.create(discountData.value);
+    await MenuItemService.create(discountData.value);
     
     serverErrors.value = {};
     handleReset();
@@ -110,7 +124,7 @@ const inputClass =
 <template>
   <section class="rounded-lg bg-slate-[#A8A8A8] shadow-lg p-6">
     <header class="hidden md:flex justify-between text-gray-900 mb-3 text-xl">
-      <h6 class="hidden md:inline-block capitalize">{{ "Add Menu" }}</h6>
+      <h6 class="hidden md:inline-block capitalize">{{ "Add Menu-Item" }}</h6>
     </header>
     <form @submit.prevent="onSubmit" ref="formRef" class="grid gap-3">
       <section class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -118,7 +132,7 @@ const inputClass =
           <label class="text-gray-500">
             Name<span class="text-red-500">*</span>
           </label>
-          <BaseInput v-model="state.name" placeholder="Menu name" />
+          <BaseInput v-model="state.name" placeholder="Menu-item name" />
         </div>
         <div class="grid gap-2">
           <label class="text-gray-500">
@@ -131,8 +145,20 @@ const inputClass =
           <SelectBranch v-model="state.branch" />
         </div>
         <div class="grid gap-2">
+          <label class="text-gray-500">Select menu</label>
+          <SelectMenu v-model="state.menu" />
+        </div>
+        <div class="grid gap-2">
           <label class="text-gray-500">Select category</label>
           <SelectCategory v-model="state.category" />
+        </div>
+        <div class="grid gap-2">
+          <label class="text-gray-500">Select tax</label>
+          <SelectTax v-model="state.tax" />
+        </div>
+        <div class="grid gap-2">
+          <label class="text-gray-500">Select discount</label>
+          <SelectDiscount v-model="state.discount" />
         </div>
         <div class="grid gap-2">
           <label class="text-gray-500">Status</label>

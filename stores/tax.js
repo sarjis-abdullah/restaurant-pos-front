@@ -1,9 +1,10 @@
 import { defineStore } from "pinia";
 import { TaxService } from "~/services/TaxService";
 
-export const useCategoryStore = defineStore("tax", {
+export const useTaxStore = defineStore("tax", {
   state: () => ({
     items: [],
+    selectedItem: null,
   }),
   getters: {
     // Example 3: Count of categories
@@ -16,13 +17,16 @@ export const useCategoryStore = defineStore("tax", {
       try {
         const response = await TaxService.getAll("");
 
-        console.log(response.data, "response");
-        this.categories = response.data || [];
+        console.log(response.data, "response tax");
+        this.items = response.data || [];
       } catch (error) {
         console.error("Error fetching items:", error);
       } finally {
         this.loading = false;
       }
+    },
+    setSelectedItem(id) {
+      this.selectedItem = id;
     },
   },
 });

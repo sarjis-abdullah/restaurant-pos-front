@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { MenuService } from "~/services/MenuService";
 
-export const useCategoryStore = defineStore("menu", {
+export const useMenuStore = defineStore("menu", {
   state: () => ({
     items: [],
   }),
@@ -17,12 +17,15 @@ export const useCategoryStore = defineStore("menu", {
         const response = await MenuService.getAll("");
 
         console.log(response.data, "response");
-        this.categories = response.data || [];
+        this.items = response.data || [];
       } catch (error) {
         console.error("Error fetching items:", error);
       } finally {
         this.loading = false;
       }
+    },
+    setSelectedItem(id) {
+      this.selectedItem = id;
     },
   },
 });
