@@ -36,12 +36,7 @@ defineProps({
     type: String,
     default: "",
   },
-  options: {
-    type: Array,
-    required: true,
-    default: () => [],
-    // Example: [{ value: 1, label: "Option 1" }, { value: 2, label: "Option 2" }]
-  },
+  
   placeholder: {
     type: String,
     default: "Select an option",
@@ -57,6 +52,12 @@ defineProps({
   loading: {
     type: Boolean,
     default: true,
+  },
+  options: {
+    type: Array,
+    required: true,
+    default: () => [],
+    // Example: [{ value: 1, label: "Option 1" }, { value: 2, label: "Option 2" }]
   },
 });
 

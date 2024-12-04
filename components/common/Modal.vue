@@ -49,8 +49,8 @@
         default: "sm:min-w-sm"
     },
  })
- const emit = defineEmits(['onClose'])
+ const emit = defineEmits(['close'])
  const onClose = ()=>{
-  emit('onClose');
+  emit('close');
  }
   </script>

@@ -5,15 +5,18 @@ import {
   CheckIcon,
   XMarkIcon,
 } from "@heroicons/vue/20/solid";
-import Menu1 from '@/components/common/Menu1.vue'
-defineProps({
+import PopupMenu from "@/components/common/Menu1.vue";
+import BaseSelect from "@/components/common/BaseSelect.vue";
+import Modal from "@/components/common/Modal.vue";
+import MenuItemVariantList from "@/components/menu-item/variant/List.vue";
+const { singleData } = defineProps({
   singleData: {
     type: Object,
     required: true,
     default: () => ({}),
   },
 });
-const menuOpen = ref(false);
+const showEditModal = ref(false);
 const isDeleting = ref(false);
 const deleteRecord = async (id) => {
   if (confirm("Are you sure to delete this record?")) {
@@ -103,6 +106,18 @@ const updateRecord = async (id) => {
     isUpdating.value = false;
   }
 };
+const selectedAction = ref("");
+const handleOptionChange = (id) => {
+  selectedAction.value = id;
+  if (id == "edit") {
+    showEditModal.value = !showEditModal.value;
+  }
+  console.log(id, singleData);
+};
+const closeModal = (id) => {
+  showEditModal.value = false;
+  selectedAction.value = "";
+};
 </script>
 
 <template>
@@ -121,23 +136,13 @@ const updateRecord = async (id) => {
       class="flex justify-center gap-1 whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"
     >
       <div class="">
-        <Menu1/>
-        <button
-          class="bg-blue-500 text-white px-2 py-1 rounded"
-          @click="menuOpen = !menuOpen"
-        >
-          Actions
-        </button>
-        <!-- Dropdown menu -->
-        <div
-          v-if="menuOpen"
-          class="absolute top-full left-0 mt-2 bg-white border border-gray-300 shadow-md rounded w-40 z-50"
-        >
-          <ul>
-            <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">Edit</li>
-            <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer">Delete</li>
-          </ul>
-        </div>
+        <BaseSelect
+          placeholder="Actions"
+          :loading="false"
+          :options="[{ name: 'Edit', id: 'edit' }]"
+          @change="handleOptionChange"
+          v-model="selectedAction"
+        />
       </div>
 
       <!-- <BasicMenu/> -->
@@ -165,6 +170,16 @@ const updateRecord = async (id) => {
       />
     </td>
   </tr>
+  <Modal
+    :open="showEditModal"
+    @close="closeModal"
+    maxWidth="max-w-2xl"
+    title="Add variant"
+  >
+    <section>
+      <MenuItemVariantList :menuItemId="singleData.id" />
+    </section>
+  </Modal>
 </template>
 
 <style lang="scss" scoped></style>
