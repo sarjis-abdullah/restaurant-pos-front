@@ -1,5 +1,5 @@
 <template>
-  <section class="grid gap-2 rounded-lg bg-slate-[#A8A8A8] shadow-lg p-6">
+  <form @submit.prevent="validateAll" class="grid gap-2 rounded-lg bg-slate-[#A8A8A8] shadow-lg p-6">
     <SingleVariant v-for="item in variants" :key="item.id" :variant="item" />
     <header class="flex justify-between text-gray-900 mb-3 text-xl">
       <button
@@ -10,15 +10,14 @@
         <PlusIcon class="h-5 w-5" />
       </button>
       <SpinnerButton
-        @click="validateAll"
         :loading="loading"
-        type="button"
+        type="submit"
       >
       </SpinnerButton>
     </header>
     <ClientErrors :errors="validator.$errors" />
     <ServerError :error="serverErrors" />
-  </section>
+  </form>
 </template>
 
 <script setup>
