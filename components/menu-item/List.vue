@@ -75,7 +75,7 @@ onMounted(() => {
           @filterOrderBy="filterOrderBy"
           @downloadOrderStatement="downloadOrderStatement"
         /> -->
-        <Titlebar title="Menu"></Titlebar>
+        <Titlebar title="Menu-item"></Titlebar>
 
           <div v-if="!loadingError && !isLoading" class="relative">
             <table

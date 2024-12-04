@@ -8,7 +8,7 @@ import {
 import PopupMenu from "@/components/common/Menu1.vue";
 import BaseSelect from "@/components/common/BaseSelect.vue";
 import Modal from "@/components/common/Modal.vue";
-import MenuItemVariantList from "@/components/menu-item/variant/List.vue";
+import MenuItemVariantList from "@/components/menu-item/variant/AddVariantList.vue";
 const { singleData } = defineProps({
   singleData: {
     type: Object,
@@ -109,7 +109,7 @@ const updateRecord = async (id) => {
 const selectedAction = ref("");
 const handleOptionChange = (id) => {
   selectedAction.value = id;
-  if (id == "edit") {
+  if (id == "variants") {
     showEditModal.value = !showEditModal.value;
   }
   console.log(id, singleData);
@@ -124,12 +124,13 @@ const closeModal = (id) => {
   <tr>
     <td class="whitespace-nowrap px-3 py-5 text-sm">
       <span class="text-gray-900"> {{ singleData?.name }}</span>
+      <div>{{ singleData?.description }}</div>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm">
-      <span class="text-gray-900"> {{ singleData?.branch_id }}</span>
+      <span class="text-gray-900"> {{ singleData?.price }}</span>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm">
-      <span class="text-gray-900"> {{ singleData?.status }}</span>
+      <span class="text-gray-900"> {{ singleData?.type }}</span>
     </td>
 
     <td
@@ -139,23 +140,22 @@ const closeModal = (id) => {
         <BaseSelect
           placeholder="Actions"
           :loading="false"
-          :options="[{ name: 'Edit', id: 'edit' }]"
+          :options="[{ name: 'Show variants', id: 'variants' }]"
           @change="handleOptionChange"
           v-model="selectedAction"
         />
       </div>
 
-      <!-- <BasicMenu/> -->
       <TrashIcon
         @click="deleteRecord(singleData.id)"
         class="h-5 w-5"
         aria-hidden="true"
       />
-      <!-- <PencilIcon
-                      @click="editRecord(singleData)"
-                      class="h-5 w-5"
-                      aria-hidden="true"
-                    /> -->
+      <PencilIcon
+        @click="editRecord(singleData)"
+        class="h-5 w-5"
+        aria-hidden="true"
+      />
       <CheckIcon
         v-if="singleData?.editMode"
         @click="updateRecord(singleData.id)"
