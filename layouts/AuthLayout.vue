@@ -244,6 +244,9 @@
 
 <script setup>
 import { ref } from "vue";
+// Use SSR-safe IDs for Headless UI
+provideHeadlessUseId(() => useId())
+
 import SingleNav from "@/components/SingleNav.vue";
 import {
   Dialog,

@@ -160,10 +160,10 @@ const inputClass =
           <label class="text-gray-500">Select discount</label>
           <SelectDiscount v-model="state.discount" />
         </div>
-        <div class="grid gap-2">
+        <!-- <div class="grid gap-2">
           <label class="text-gray-500">Status</label>
           <BaseSelect :options="options" v-model="state.status" :loading="false" />
-        </div>
+        </div> -->
       </section>
       
       <ServerError :error="serverErrors" />
