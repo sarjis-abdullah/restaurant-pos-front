@@ -26,7 +26,6 @@ export class HttpRequester extends BaseHttpRequester {
         throw await this.handleError(response);
       }
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
@@ -74,7 +73,6 @@ export class HttpRequester extends BaseHttpRequester {
       if (!auth) {
         delete req.headers.Authorization;
       }
-      console.log(req, "reque");
       const response = await fetch(this.DEVELOPMENT_API_URL + url, req);
       if (response.ok) {
         const res = await response.json();

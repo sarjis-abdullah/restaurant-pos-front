@@ -1,17 +1,9 @@
 <script setup>
-import { onMounted, reactive, ref } from "vue";
-import Link from "@/components/common/Link.vue";
+import { onMounted, ref } from "vue";
 import Pagination from "@/components/common/Pagination.vue";
-import { TariffService } from "@/services/TariffService.js";
-import { formatDate } from "@/utils/index";
 import Titlebar from "@/components/common/Titlebar.vue";
-import BaseInput from "@/components/common/BaseInput.vue";
-// import BasicMenu from "@/components/common/BasicMenu.vue";
 import SingleMenuItem from "@/components/menu-item/SingleMenuItem.vue";
-
-
 import Loading from "@/components/common/Loading.vue";
-import ClientErrors from "@/components/common/ClientErrors.vue";
 import ServerError from "@/components/common/Error.vue";
 import { MenuItemService } from "~/services/MenuItemService";
 
@@ -42,17 +34,21 @@ const loadData = async () => {
     lastPage.value = meta.last_page;
     total.value = meta.total;
     totalPerPage.value = data.length;
-
     serverErrors.value = {};
-    // handleReset();
   } catch (error) {
     serverErrors.value = error.errors;
   } finally {
     isLoading.value = false;
   }
 };
-
-
+const updateList = (item) => {
+  list.value = list.value.map((i) => {
+    if (i.id == item.id) {
+      return item;
+    }
+    return i;
+  });
+};
 
 const onPageChanged = (p) => {
   page.value = p;
@@ -75,7 +71,7 @@ onMounted(() => {
           @filterOrderBy="filterOrderBy"
           @downloadOrderStatement="downloadOrderStatement"
         /> -->
-        <Titlebar title="Menu-item"></Titlebar>
+          <Titlebar title="Menu-item"></Titlebar>
 
           <div v-if="!loadingError && !isLoading" class="relative">
             <table
@@ -94,21 +90,26 @@ onMounted(() => {
                     scope="col"
                     class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Branch
+                    Price
                   </th>
                   <th
                     scope="col"
                     class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Status
+                    Type
                   </th>
                   <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
-                    Action
+                    Actions
                   </th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 bg-white">
-                <SingleMenuItem v-for="singleData in list" :key="singleData.id" :singleData="singleData" />
+                <SingleMenuItem
+                  v-for="singleData in list"
+                  :key="singleData.id"
+                  :singleData="singleData"
+                  @update:list="updateList"
+                />
               </tbody>
             </table>
             <div v-else class="text-center py-10">
@@ -134,6 +135,6 @@ onMounted(() => {
       :totalPerPage="totalPerPage"
       @onChange="onPageChanged"
     />
-    <Loading v-if="isLoading || isDeleting" />
+    <Loading v-if="isLoading" />
   </div>
 </template>

@@ -7,8 +7,13 @@ import {
 } from "@heroicons/vue/20/solid";
 import PopupMenu from "@/components/common/Menu1.vue";
 import BaseSelect from "@/components/common/BaseSelect.vue";
+import BaseInput from "@/components/common/BaseInput.vue";
 import Modal from "@/components/common/Modal.vue";
+import ServerError from "@/components/common/Error.vue";
+import Loader from "@/components/common/Loading.vue";
 import MenuItemVariantList from "@/components/menu-item/variant/AddVariantList.vue";
+import { MenuItemService } from "~/services/MenuItemService";
+const emit = defineEmits(["update:list"]);
 const { singleData } = defineProps({
   singleData: {
     type: Object,
@@ -18,6 +23,7 @@ const { singleData } = defineProps({
 });
 const showEditModal = ref(false);
 const isDeleting = ref(false);
+const serverErrors = ref({});
 const deleteRecord = async (id) => {
   if (confirm("Are you sure to delete this record?")) {
     try {
@@ -34,10 +40,13 @@ const deleteRecord = async (id) => {
     }
   }
 };
+const editMode = ref(false);
 const record = reactive({
   id: "",
-  promoCode: "",
-  isActive: false,
+  name: "",
+  price: "",
+  type: "",
+  description: "",
 });
 const formatDateForInput = (date) => {
   if (!date) {
@@ -47,58 +56,32 @@ const formatDateForInput = (date) => {
   return match ? match[1] : "";
 };
 const editRecord = (props) => {
+  editMode.value = !editMode.value;
   record.id = props.id;
-  record.promoCode = props.promo_code;
-  record.isActive = props.is_active ? true : false;
-  // record.startDate = formatDateForInput(props.start_date);
-  // record.endDate = formatDateForInput(props.end_date);
-  list.value = list.value.map((item) => {
-    if (item.id == props.id) {
-      return {
-        ...item,
-        editMode: true,
-      };
-    }
-    return {
-      ...item,
-      editMode: false,
-    };
-  });
+  record.name = props.name;
+  record.price = props.price;
+  record.type = props.type;
+  record.description = props.description;
 };
 const isUpdating = ref(false);
 const updateableRecord = computed(() => {
-  return {
-    promo_code: record.promoCode,
-    is_active: record.isActive,
-  };
+  const data = { ...record };
+  delete data.id;
+  return data;
 });
-const cancelUpdatingRecord = async (id) => {
-  list.value = list.value.map((item) => {
-    return {
-      ...item,
-      editMode: false,
-    };
-  });
+const cancelUpdatingRecord = () => {
+  editMode.value = false;
+  for (let key in record) {
+    record[key] = "";
+  }
 };
 const updateRecord = async (id) => {
   try {
     isUpdating.value = true;
+    console.log(id, updateableRecord.value);
     const res = await MenuItemService.put(id, updateableRecord.value);
-    list.value = list.value.map((item) => {
-      if (item.id == id) {
-        item.promo_code = record.promoCode;
-        item.is_active = record.isActive;
-        // item.end_date = record.endDate;
-        // item.default = record.default;
-        item.editMode = false;
-        return item;
-      }
-      // if (record.default) {
-      //   item.default = false;
-      // }
-      return item;
-    });
-
+    emit("update:list", res.data);
+    editMode.value = false;
     serverErrors.value = {};
   } catch (error) {
     serverErrors.value = error.errors;
@@ -123,52 +106,72 @@ const closeModal = (id) => {
 <template>
   <tr>
     <td class="whitespace-nowrap px-3 py-5 text-sm">
-      <span class="text-gray-900"> {{ singleData?.name }}</span>
-      <div>{{ singleData?.description }}</div>
+      <template v-if="!editMode">
+        <span class="text-gray-900"> {{ singleData?.name }}</span>
+        <div>{{ singleData?.description }}</div>
+      </template>
+      <template v-else>
+        <BaseInput v-model="record.name" placeholder="e.g. Name" />
+        <BaseInput
+          v-model="record.description"
+          placeholder="e.g. Description"
+        />
+      </template>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm">
-      <span class="text-gray-900"> {{ singleData?.price }}</span>
+      <template v-if="editMode">
+        <BaseInput v-model="record.price" placeholder="e.g. 10" />
+      </template>
+      <span v-else class="text-gray-900"> {{ singleData?.price }}</span>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm">
-      <span class="text-gray-900"> {{ singleData?.type }}</span>
+      <template v-if="editMode">
+        <BaseInput v-model="record.type" placeholder="e.g. Color" />
+      </template>
+      <span v-else class="text-gray-900"> {{ singleData?.type }}</span>
     </td>
 
     <td
-      class="flex justify-center gap-1 whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"
+      class="flex justify-center items-center gap-1 whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"
     >
       <div class="">
         <BaseSelect
-          placeholder="Actions"
+          placeholder="Select"
           :loading="false"
           :options="[{ name: 'Show variants', id: 'variants' }]"
           @change="handleOptionChange"
           v-model="selectedAction"
         />
       </div>
-
+      
       <TrashIcon
         @click="deleteRecord(singleData.id)"
         class="h-5 w-5"
         aria-hidden="true"
       />
       <PencilIcon
+        v-if="!editMode"
         @click="editRecord(singleData)"
         class="h-5 w-5"
         aria-hidden="true"
       />
       <CheckIcon
-        v-if="singleData?.editMode"
+        v-if="editMode"
         @click="updateRecord(singleData.id)"
         class="h-5 w-5 text-blue-500"
         aria-hidden="true"
       />
       <XMarkIcon
-        v-if="singleData?.editMode"
-        @click="cancelUpdatingRecord(singleData.id)"
+        v-if="editMode"
+        @click="cancelUpdatingRecord"
         class="h-5 w-5 text-red-500"
         aria-hidden="true"
       />
+      <Loader parentClass="" v-if="editMode && (isDeleting || isUpdating)" />
     </td>
+  </tr>
+  <tr v-if="serverErrors && Object.keys(serverErrors).length">
+    <ServerError :error="serverErrors" />
   </tr>
   <Modal
     :open="showEditModal"

@@ -46,7 +46,7 @@ const defaultVariant = {
   price: "",
   type: "",
 };
-const variants = ref([]);
+const variants = ref([defaultVariant]);
 
 const rules = computed(() => {
   return variants.value.map(() => ({
