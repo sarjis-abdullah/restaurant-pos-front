@@ -12,6 +12,7 @@ import Modal from "@/components/common/Modal.vue";
 import ServerError from "@/components/common/Error.vue";
 import Loader from "@/components/common/Loading.vue";
 import MenuItemVariantList from "@/components/menu-item/variant/AddVariantList.vue";
+import MenuItemAddonList from "@/components/menu-item/addon/AddAddonList.vue";
 import { MenuItemService } from "~/services/MenuItemService";
 const emit = defineEmits(["update:list"]);
 const { singleData } = defineProps({
@@ -21,7 +22,8 @@ const { singleData } = defineProps({
     default: () => ({}),
   },
 });
-const showEditModal = ref(false);
+const showVariantModal = ref(false);
+const showAddonModal = ref(false);
 const isDeleting = ref(false);
 const serverErrors = ref({});
 const deleteRecord = async (id) => {
@@ -93,12 +95,15 @@ const selectedAction = ref("");
 const handleOptionChange = (id) => {
   selectedAction.value = id;
   if (id == "variants") {
-    showEditModal.value = !showEditModal.value;
+    showVariantModal.value = !showVariantModal.value;
+  }else if (id == "addons") {
+    showAddonModal.value = !showAddonModal.value;
   }
   console.log(id, singleData);
 };
 const closeModal = (id) => {
-  showEditModal.value = false;
+  showVariantModal.value = false;
+  showAddonModal.value = false;
   selectedAction.value = "";
 };
 </script>
@@ -138,7 +143,7 @@ const closeModal = (id) => {
           <BaseSelect
             placeholder="Select"
             :loading="false"
-            :options="[{ name: 'Show variants', id: 'variants' }]"
+            :options="[{ name: 'Show variants', id: 'variants' }, { name: 'Show addons', id: 'addons' }]"
             @change="handleOptionChange"
             v-model="selectedAction"
           />
@@ -174,13 +179,23 @@ const closeModal = (id) => {
     <ServerError :error="serverErrors" />
   </tr>
   <Modal
-    :open="showEditModal"
+    :open="showVariantModal"
     @close="closeModal"
     maxWidth="max-w-2xl"
     title="Add variant"
   >
     <section>
       <MenuItemVariantList :menuItemId="singleData.id" />
+    </section>
+  </Modal>
+  <Modal
+    :open="showAddonModal"
+    @close="closeModal"
+    maxWidth="max-w-2xl"
+    title="Add addons"
+  >
+    <section>
+      <MenuItemAddonList :menuItemId="singleData.id" />
     </section>
   </Modal>
 </template>
