@@ -15,7 +15,7 @@ import Loading from "@/components/common/Loading.vue";
 import ClientErrors from "@/components/common/ClientErrors.vue";
 import ServerError from "@/components/common/Error.vue";
 import { AddonService } from "~/services/AddonService";
-
+import SingleAddon from './SingleAddon.vue'
 const { menuItemId } = defineProps({
   menuItemId: {
     description: Number,
@@ -23,9 +23,6 @@ const { menuItemId } = defineProps({
     default: null,
   },
 });
-const inputClass =
-  "relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:outline-none focus:ring-blue-500 sm:text-sm focus:border-blue-500";
-
 const list = ref([]);
 const loadingError = ref(null);
 const isLoading = ref(true);
@@ -62,87 +59,18 @@ const loadData = async () => {
   }
 };
 
-const isDeleting = ref(false);
-const deleteRecord = async (id) => {
-  if (confirm("Are you sure to delete this record?")) {
-    try {
-      isDeleting.value = true;
-      const res = await AddonService.delete(id);
-      list.value = list.value.filter((item) => item.id != id);
-
-      serverErrors.value = {};
-      // handleReset();
-    } catch (error) {
-      serverErrors.value = error.errors;
-    } finally {
-      isDeleting.value = false;
-    }
-  }
-};
-const record = reactive({
-  id: "",
-  name: "",
-  price: '',
-  description: '',
-});
-
-const editRecord = (props) => {
-  record.id = props.id;
-  record.price = props.price;
-  record.name = props.name;
-  record.description = props.description;
-  list.value = list.value.map((item) => {
-    if (item.id == props.id) {
-      return {
-        ...item,
-        editMode: true,
-      };
-    }
-    return {
-      ...item,
-      editMode: false,
-    };
-  });
-};
-const isUpdating = ref(false);
-const updateableRecord = computed(() => {
-  return {
-    name: record.name,
-    description: record.description,
-    price: record.price,
-  };
-});
-const cancelUpdatingRecord = async (id) => {
-  list.value = list.value.map((item) => {
-    return {
-      ...item,
-      editMode: false,
-    };
-  });
-};
-const updateRecord = async (id) => {
-  try {
-    isUpdating.value = true;
-    const res = await AddonService.put(id, updateableRecord.value);
-    list.value = list.value.map((item) => {
-      if (item.id == id) {
-        item.name = record.name;
-        item.price = record.price;
-        item.description = record.description;
-        item.editMode = false;
-        return item;
-      }
+const updateList = (item) => {
+  console.log(item, 'item');
+  list.value = list.value.map((i) => {
+    if (i.id == item.id) {
       return item;
-    });
-
-    serverErrors.value = {};
-  } catch (error) {
-    serverErrors.value = error.errors;
-  } finally {
-    isUpdating.value = false;
-  }
+    }
+    return i;
+  });
 };
-
+const handleDelete = (id) => {
+  list.value = list.value.filter((i) => i.id != id);
+};
 const onPageChanged = (p) => {
   page.value = p;
   loadData();
@@ -177,7 +105,7 @@ onMounted(() => {
                     scope="col"
                     class="py-3.5 pl-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
                   >
-                    Name
+                    Name/Description
                   </th>
                   <th
                     scope="col"
@@ -185,92 +113,14 @@ onMounted(() => {
                   >
                     Price
                   </th>
-                  <th
-                    scope="col"
-                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                  >
-                    Description
-                  </th>
                   <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
                     Action
                   </th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 bg-white">
-                <tr v-for="singleData in list" :key="singleData.id">
-                  <!-- <pre>{{ record }}</pre> -->
-                  <td class="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
-                    <div class="flex items-center">
-                      <div class="ml-4">
-                        <div
-                          v-if="singleData.editMode"
-                          class="mt-1 text-gray-500"
-                        >
-                          <input
-                            :class="inputClass"
-                            v-model="record.name"
-                            type="text"
-                            placeholder="e.g. red"
-                          />
-                        </div>
-                        <div v-else class="font-medium text-gray-900">
-                          {{ singleData.name }}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="whitespace-nowrap px-3 py-5 text-sm">
-                    <div v-if="singleData.editMode">
-                      <input
-                        :class="inputClass"
-                        v-model="record.price"
-                        type="number"
-                        placeholder="e.g. 10"
-                      />
-                    </div>
-                    <span v-else class="text-gray-900">
-                      {{ singleData?.price }}</span
-                    >
-                  </td>
-                  <td class="whitespace-nowrap px-3 py-5 text-sm">
-                    <div v-if="singleData.editMode">
-                      <input
-                        :class="inputClass"
-                        v-model="record.description"
-                        type="text"
-                        placeholder="e.g. Description"
-                      />
-                    </div>
-                    <span v-else class="text-gray-900"> {{ singleData?.description }}</span>
-                  </td>
-
-                  <td
-                    class="flex justify-center gap-1 relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"
-                  >
-                    <TrashIcon
-                      @click="deleteRecord(singleData.id)"
-                      class="h-5 w-5"
-                      aria-hidden="true"
-                    />
-                    <PencilIcon
-                      @click="editRecord(singleData)"
-                      class="h-5 w-5"
-                      aria-hidden="true"
-                    />
-                    <CheckIcon
-                      v-if="singleData?.editMode"
-                      @click="updateRecord(singleData.id)"
-                      class="h-5 w-5 text-blue-500"
-                      aria-hidden="true"
-                    />
-                    <XMarkIcon
-                      v-if="singleData?.editMode"
-                      @click="cancelUpdatingRecord(singleData.id)"
-                      class="h-5 w-5 text-red-500"
-                      aria-hidden="true"
-                    />
-                  </td>
-                </tr>
+                <SingleAddon v-for="singleData in list" :key="singleData.id" :singleData="singleData" @update:list="updateList" @handle-delete:list="handleDelete">
+                </SingleAddon>
               </tbody>
             </table>
             <div v-else class="text-center py-10">
@@ -296,6 +146,6 @@ onMounted(() => {
       :totalPerPage="totalPerPage"
       @onChange="onPageChanged"
     />
-    <Loading v-if="isLoading || isDeleting || isUpdating" />
+    <Loading v-if="isLoading" />
   </div>
 </template>
