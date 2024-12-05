@@ -19,7 +19,7 @@
     <ClientErrors :errors="validator.$errors" />
     <ServerError :error="serverErrors" />
   </form>
-  <VariantList :menuItemId="menuItemId" :key="newVariantsAddedKey" />
+  <VariantList :addonId="addonId" :key="newVariantsAddedKey" />
 </template>
 
 <script setup>
@@ -31,10 +31,10 @@ import { required, helpers } from "@vuelidate/validators";
 import ClientErrors from "@/components/common/ClientErrors.vue";
 import ServerError from "@/components/common/Error.vue";
 import SpinnerButton from "@/components/common/SpinnerButton.vue";
-import { VariantService } from "~/services/VariantService";
+import { AddonVariantService } from "~/services/AddonVariantService";
 
-const { menuItemId } = defineProps({
-  menuItemId: {
+const { addonId } = defineProps({
+  addonId: {
     type: Number,
     required: true,
     default: null,
@@ -86,7 +86,7 @@ const loading = ref(false);
 const serverErrors = ref({});
 const variantData = computed(() => {
   return {
-    menu_item_id: menuItemId,
+    addon_id: addonId,
     variants: variants.value.map((i) => {
       delete i.id;
       return i;
@@ -97,7 +97,7 @@ const newVariantsAddedKey = ref(1)
 const saveVariants = async () => {
   try {
     loading.value = true;
-    const res = await VariantService.create(variantData.value);
+    const res = await AddonVariantService.create(variantData.value);
     newVariantsAddedKey.value++
     serverErrors.value = {};
     handleReset();

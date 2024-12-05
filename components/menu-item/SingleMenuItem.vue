@@ -182,7 +182,7 @@ const closeModal = (id) => {
     :open="showVariantModal"
     @close="closeModal"
     maxWidth="max-w-2xl"
-    title="Add variant"
+    title="Add menu-item variants"
   >
     <section>
       <MenuItemVariantList :menuItemId="singleData.id" />
@@ -192,7 +192,7 @@ const closeModal = (id) => {
     :open="showAddonModal"
     @close="closeModal"
     maxWidth="max-w-2xl"
-    title="Add addons"
+    title="Add menu-item addons"
   >
     <section>
       <MenuItemAddonList :menuItemId="singleData.id" />

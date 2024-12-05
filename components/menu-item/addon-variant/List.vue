@@ -14,10 +14,10 @@ import {
 import Loading from "@/components/common/Loading.vue";
 import ClientErrors from "@/components/common/ClientErrors.vue";
 import ServerError from "@/components/common/Error.vue";
-import { VariantService } from "~/services/VariantService";
+import { AddonVariantService } from "~/services/AddonVariantService";
 
-const { menuItemId } = defineProps({
-  menuItemId: {
+const { addonId } = defineProps({
+  addonId: {
     type: Number,
     required: true,
     default: null,
@@ -39,13 +39,13 @@ const total = ref(null);
 const totalPerPage = ref(null);
 
 const searchQuery = computed(() => {
-  return `?menu_item_id=${menuItemId}&page=${page.value}&per_page=${perPage.value}`;
+  return `?addon_id=${addonId}&page=${page.value}&per_page=${perPage.value}`;
 });
 
 const loadData = async () => {
   try {
     isLoading.value = true;
-    const { meta, data } = await VariantService.getAll(searchQuery.value);
+    const { meta, data } = await AddonVariantService.getAll(searchQuery.value);
     list.value = data;
 
     page.value = meta.current_page;
@@ -67,7 +67,7 @@ const deleteRecord = async (id) => {
   if (confirm("Are you sure to delete this record?")) {
     try {
       isDeleting.value = true;
-      const res = await VariantService.delete(id);
+      const res = await AddonVariantService.delete(id);
       list.value = list.value.filter((item) => item.id != id);
 
       serverErrors.value = {};
@@ -123,7 +123,7 @@ const cancelUpdatingRecord = async (id) => {
 const updateRecord = async (id) => {
   try {
     isUpdating.value = true;
-    const res = await VariantService.put(id, updateableRecord.value);
+    const res = await AddonVariantService.put(id, updateableRecord.value);
     list.value = list.value.map((item) => {
       if (item.id == id) {
         item.name = record.name;
