@@ -110,19 +110,21 @@ const closeModal = (id) => {
         <span class="text-gray-900"> {{ singleData?.name }}</span>
         <div>{{ singleData?.description }}</div>
       </template>
-      <template v-else>
+      <div v-else class="flex flex-col gap-2">
         <BaseInput v-model="record.name" placeholder="e.g. Name" />
         <BaseInput
           v-model="record.description"
           placeholder="e.g. Description"
         />
-      </template>
+      </div>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm">
-      <template v-if="editMode">
-        <BaseInput v-model="record.price" placeholder="e.g. 10" />
-      </template>
-      <span v-else class="text-gray-900"> {{ singleData?.price }}</span>
+      <section class="flex gap-1 items-center">
+        <template v-if="editMode">
+          <BaseInput v-model="record.price" placeholder="e.g. 10" type="number" />
+        </template>
+        <span v-else class="text-gray-900"> {{ singleData?.price }}</span>
+      </section>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm">
       <template v-if="editMode">
@@ -130,44 +132,42 @@ const closeModal = (id) => {
       </template>
       <span v-else class="text-gray-900"> {{ singleData?.type }}</span>
     </td>
-
-    <td
-      class="flex justify-center items-center gap-1 whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"
-    >
-      <div class="">
-        <BaseSelect
-          placeholder="Select"
-          :loading="false"
-          :options="[{ name: 'Show variants', id: 'variants' }]"
-          @change="handleOptionChange"
-          v-model="selectedAction"
+    <td class="whitespace-nowrap px-3 py-5 text-sm">
+      <section class="flex gap-1 items-center justify-center">
+        <div class="">
+          <BaseSelect
+            placeholder="Select"
+            :loading="false"
+            :options="[{ name: 'Show variants', id: 'variants' }]"
+            @change="handleOptionChange"
+            v-model="selectedAction"
+          />
+        </div>
+        <TrashIcon
+          @click="deleteRecord(singleData.id)"
+          class="h-5 w-5"
+          aria-hidden="true"
         />
-      </div>
-      
-      <TrashIcon
-        @click="deleteRecord(singleData.id)"
-        class="h-5 w-5"
-        aria-hidden="true"
-      />
-      <PencilIcon
-        v-if="!editMode"
-        @click="editRecord(singleData)"
-        class="h-5 w-5"
-        aria-hidden="true"
-      />
-      <CheckIcon
-        v-if="editMode"
-        @click="updateRecord(singleData.id)"
-        class="h-5 w-5 text-blue-500"
-        aria-hidden="true"
-      />
-      <XMarkIcon
-        v-if="editMode"
-        @click="cancelUpdatingRecord"
-        class="h-5 w-5 text-red-500"
-        aria-hidden="true"
-      />
-      <Loader parentClass="" v-if="editMode && (isDeleting || isUpdating)" />
+        <PencilIcon
+          v-if="!editMode"
+          @click="editRecord(singleData)"
+          class="h-5 w-5"
+          aria-hidden="true"
+        />
+        <CheckIcon
+          v-if="editMode"
+          @click="updateRecord(singleData.id)"
+          class="h-5 w-5 text-blue-500"
+          aria-hidden="true"
+        />
+        <XMarkIcon
+          v-if="editMode"
+          @click="cancelUpdatingRecord"
+          class="h-5 w-5 text-red-500"
+          aria-hidden="true"
+        />
+        <!-- <Loader parentClass="" v-if="editMode && (isDeleting || isUpdating)" /> -->
+      </section>
     </td>
   </tr>
   <tr v-if="serverErrors && Object.keys(serverErrors).length">

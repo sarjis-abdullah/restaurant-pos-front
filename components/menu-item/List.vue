@@ -5,7 +5,9 @@ import Titlebar from "@/components/common/Titlebar.vue";
 import SingleMenuItem from "@/components/menu-item/SingleMenuItem.vue";
 import Loading from "@/components/common/Loading.vue";
 import ServerError from "@/components/common/Error.vue";
+import SelectMenu from "@/components/menu/SelectMenu.vue";
 import { MenuItemService } from "~/services/MenuItemService";
+import Link from "../common/Link.vue";
 
 const list = ref([]);
 const loadingError = ref(null);
@@ -19,9 +21,13 @@ const perPage = ref(10);
 const lastPage = ref(null);
 const total = ref(null);
 const totalPerPage = ref(null);
-
+const menuId = ref(null);
 const searchQuery = computed(() => {
-  return `?page=${page.value}&per_page=${perPage.value}`;
+  let query = `?page=${page.value}&per_page=${perPage.value}`;
+  if (menuId.value) {
+    query += `&menu_id=${menuId.value}`;
+  }
+  return query;
 });
 
 const loadData = async () => {
@@ -52,10 +58,34 @@ const updateList = (item) => {
 
 const onPageChanged = (p) => {
   page.value = p;
-  loadData();
+  // loadData();
 };
+watch(
+  [searchQuery],
+  ([newsearchQuery], [prevsearchQuery]) => {
+    if (newsearchQuery != prevsearchQuery) {
+      loadData();
+    }
+  },
+  {
+    immediate: true,
+    deep: true,
+  }
+);
+// watch(
+//   () => searchQuery,
+//   (newValue, oldValue) => {
+//     if (newValue != oldValue) {
+//       loadData();
+//     }
+//   },
+//   {
+//     immediate: true,
+//     deep: true,
+//   }
+// );
 onMounted(() => {
-  loadData();
+  // loadData();
 });
 </script>
 <template>
@@ -63,15 +93,25 @@ onMounted(() => {
     <div class="md:mt-8 flow-root">
       <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-          <!-- <OrderFilters
-          v-if="showFilterButton"
-          :title="title"
-          :showFilterButton="showFilterButton"
-          :pdfLoading="pdfLoading"
-          @filterOrderBy="filterOrderBy"
-          @downloadOrderStatement="downloadOrderStatement"
-        /> -->
-          <Titlebar title="Menu-item"></Titlebar>
+          <header class="flex justify-between text-gray-900 mb-3 text-xl">
+            <h6 class="hidden md:inline-block capitalize">Menu-item List</h6>
+            <div
+              class="flex items-center flex-col md:flex-row gap-2 w-full md:w-auto"
+              data-v-inspector="components/common/Titlebar.vue:4:5"
+            >
+              <div>
+                <SelectMenu  v-model="menuId" />
+              </div>
+              <div>
+                <Link
+                to="/add/menu-item"
+                class="bg-brand-400 text-white hover:bg-brand-500 px-3 py-1 rounded w-full md:w-auto text-center"
+              >
+                Add menu-item
+              </Link>
+              </div>
+            </div>
+          </header>
 
           <div v-if="!loadingError && !isLoading" class="relative">
             <table
