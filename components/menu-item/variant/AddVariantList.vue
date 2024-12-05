@@ -1,6 +1,6 @@
 <template>
   <form @submit.prevent="validateAll" class="grid gap-2 rounded-lg bg-slate-[#A8A8A8] shadow-lg p-6">
-    <SingleVariant v-for="item in variants" :key="item.id" :variant="item" />
+    <AddSingleVariant v-for="item in variants" :key="item.id" :variant="item" />
     <header class="flex justify-between text-gray-900 mb-3 text-xl">
       <button
         @click="addNewVariant"
@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import SingleVariant from "./SingleVariant.vue";
+import AddSingleVariant from "./AddSingleVariant.vue";
 import VariantList from "./List.vue";
 import { PlusIcon, FolderIcon } from "@heroicons/vue/20/solid";
 import useVuelidate from "@vuelidate/core";
