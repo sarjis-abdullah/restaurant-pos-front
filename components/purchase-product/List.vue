@@ -2,11 +2,11 @@
 import { onMounted, ref } from "vue";
 import Pagination from "@/components/common/Pagination.vue";
 import Titlebar from "@/components/common/Titlebar.vue";
-import SinglePurchaseItem from "@/components/purchase/SinglePurchaseItem.vue";
+import SinglePurchaseItem from "@/components/purchase-product/SinglePurchaseItem.vue";
 import Loading from "@/components/common/Loading.vue";
 import ServerError from "@/components/common/Error.vue";
 import SelectMenu from "@/components/menu/SelectMenu.vue";
-import { PurchaseService } from "~/services/PurchaseService";
+import { PurchaseProductService } from "~/services/PurchaseProductService";
 import Link from "../common/Link.vue";
 
 const list = ref([]);
@@ -23,7 +23,7 @@ const total = ref(null);
 const totalPerPage = ref(null);
 const menuId = ref(null);
 const searchQuery = computed(() => {
-  const include = "&include=purchase.supplier,purchase.payments,purchase.due"
+  const include = "&include=pp.purchase,purchase.supplier"
   let query = `?page=${page.value}&per_page=${perPage.value}${include}`;
   if (menuId.value) {
     query += `&menu_id=${menuId.value}`;
@@ -34,7 +34,7 @@ const searchQuery = computed(() => {
 const loadData = async () => {
   try {
     isLoading.value = true;
-    const { meta, data } = await PurchaseService.getAll(searchQuery.value);
+    const { meta, data } = await PurchaseProductService.getAll(searchQuery.value);
     list.value = data;
 
     page.value = meta.current_page;
@@ -95,7 +95,7 @@ onMounted(() => {
       <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
           <header class="flex justify-between text-gray-900 mb-3 text-xl">
-            <h6 class="hidden md:inline-block capitalize">Purchase List</h6>
+            <h6 class="hidden md:inline-block capitalize">Purchased products</h6>
             <div
               class="flex items-center flex-col md:flex-row gap-2 w-full md:w-auto"
               data-v-inspector="components/common/Titlebar.vue:4:5"
@@ -108,7 +108,7 @@ onMounted(() => {
                 to="/add/menu-item"
                 class="bg-brand-400 text-white hover:bg-brand-500 px-3 py-1 rounded w-full md:w-auto text-center"
               >
-                Add new purchase
+                Add purchase
               </Link>
               </div>
             </div>
@@ -143,31 +143,37 @@ onMounted(() => {
                     scope="col"
                     class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Total amount
+                  quantity
                   </th>
                   <th
                     scope="col"
                     class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Due
+                  purchase_price
                   </th>
                   <th
                     scope="col"
                     class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Paid
+                    Selling price
                   </th>
                   <th
                     scope="col"
                     class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Payment method
+                  subtotal
                   </th>
                   <th
                     scope="col"
                     class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Payment status
+                    Tax
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Discount
                   </th>
                   <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
                     Actions

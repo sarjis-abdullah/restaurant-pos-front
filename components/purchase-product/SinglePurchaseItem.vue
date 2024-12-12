@@ -114,13 +114,11 @@ const closeModal = (id) => {
 <template>
   <tr>
     <td class="whitespace-nowrap px-3 py-5 text-sm">
-      <span class="text-gray-900">
-          {{ singleData?.index }}
-        </span>
+      <span class="text-gray-900"> {{ singleData?.index }}</span>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm">
       <template v-if="!editMode">
-        <span class="text-gray-900">{{ singleData?.purchase_date }}</span>
+        <span class="text-gray-900"> {{ singleData?.purchase?.purchase_date }}</span>
       </template>
       <div v-else class="flex flex-col gap-2">
         <BaseInput v-model="record.name" placeholder="e.g. Name" />
@@ -135,50 +133,47 @@ const closeModal = (id) => {
         <template v-if="editMode">
           <BaseInput v-model="record.price" placeholder="e.g. 10" type="number" />
         </template>
-        <span v-else class="text-gray-900"> {{ singleData?.supplier?.name }}</span>
+        <span v-else class="text-gray-900"> {{ singleData?.purchase?.supplier?.name }}</span>
       </section>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm">
       <template v-if="editMode">
         <BaseInput v-model="record.type" placeholder="e.g. Color" />
       </template>
-      <span v-else class="text-gray-900"> {{ singleData?.total_amount }}</span>
+      <span v-else class="text-gray-900"> {{ singleData?.quantity }}</span>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm">
       <template v-if="editMode">
         <BaseInput v-model="record.type" placeholder="e.g. Color" />
       </template>
-      <span v-else class="text-gray-900"> {{ singleData?.due }}</span>
+      <span v-else class="text-gray-900"> {{ singleData?.purchase_price }}</span>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm">
       <template v-if="editMode">
         <BaseInput v-model="record.type" placeholder="e.g. Color" />
       </template>
-      <span v-else class="text-gray-900"> {{ totalPaid }}</span>
+      <span v-else class="text-gray-900"> {{ singleData?.selling_price }}</span>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm">
       <template v-if="editMode">
         <BaseInput v-model="record.type" placeholder="e.g. Color" />
       </template>
-      <span v-else class="text-gray-900"> {{ singleData?.paid ?? 0 }}</span>
+      <span v-else class="text-gray-900"> {{ singleData?.subtotal }}</span>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm">
       <template v-if="editMode">
         <BaseInput v-model="record.type" placeholder="e.g. Color" />
       </template>
-      <span v-else class="text-gray-900"> {{ singleData?.paid ?? 0 }}</span>
+      <span v-else class="text-gray-900"> {{ singleData?.tax_amount }}</span>
+    </td>
+    <td class="whitespace-nowrap px-3 py-5 text-sm">
+      <template v-if="editMode">
+        <BaseInput v-model="record.type" placeholder="e.g. Color" />
+      </template>
+      <span v-else class="text-gray-900"> {{ singleData?.discount_amount }}</span>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm">
       <section class="flex gap-1 items-center justify-center">
-        <!-- <div class="">
-          <BaseSelect
-            placeholder="Select"
-            :loading="false"
-            :options="[{ name: 'Show variants', id: 'variants' }, { name: 'Show addons', id: 'addons' }]"
-            @change="handleOptionChange"
-            v-model="selectedAction"
-          />
-        </div> -->
         <TrashIcon
           @click="deleteRecord(singleData.id)"
           class="h-5 w-5"
