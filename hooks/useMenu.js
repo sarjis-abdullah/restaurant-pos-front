@@ -73,6 +73,15 @@ export const useMenu = () => {
     menuItems: !authUser.value ? [] : operator.value?.name ? [cashflow, parking] : [
       // { name: "Dashboard", href: "/dashboard", icon: HomeIcon, show: false },
       {
+        name: "Purchase",
+        href: "/purchase",
+        show: false,
+        children: [
+          { name: "Add", href: "/add/purchase", icon: PlusIcon },
+          { name: "List", href: "/purchase", icon: TableCellsIcon },
+        ],
+      },
+      {
         name: "User",
         href: "/user",
         show: false,
