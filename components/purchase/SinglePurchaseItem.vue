@@ -1,7 +1,7 @@
 <script setup>
 import {
   TrashIcon,
-  PencilIcon,
+  EyeIcon,
   CheckIcon,
   XMarkIcon,
 } from "@heroicons/vue/20/solid";
@@ -59,6 +59,10 @@ const formatDateForInput = (date) => {
   }
   const match = date.match(/^(\d{4}-\d{2}-\d{2})/);
   return match ? match[1] : "";
+};
+const viewRecord = (props) => {
+  const url = "/purchase-details/" + props.id
+  window.open(url, '_blank').focus();
 };
 const editRecord = (props) => {
   editMode.value = !editMode.value;
@@ -184,9 +188,8 @@ const closeModal = (id) => {
           class="h-5 w-5"
           aria-hidden="true"
         />
-        <PencilIcon
-          v-if="!editMode"
-          @click="editRecord(singleData)"
+        <EyeIcon
+          @click="viewRecord(singleData)"
           class="h-5 w-5"
           aria-hidden="true"
         />

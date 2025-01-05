@@ -16,7 +16,7 @@ definePageMeta({
 const PERCENTAGE = "percentage"
 const defaultData = {
   name: "",
-  discountAmount: 0,
+  discount: 0,
   discountType: PERCENTAGE,
   default: false,
 };
@@ -27,7 +27,7 @@ const state = reactive(defaultData);
 const rules = computed(() => {
   return {
     name: { required: helpers.withMessage("Name is required", required) },
-    discountAmount: { 
+    discount: { 
       required: helpers.withMessage("Discount amount is required", required),
       minValue: helpers.withMessage("Discount amount must be at least 1", minValue(0)),
     },
@@ -44,7 +44,7 @@ const handleReset = async () => {
     state[key] = "";
   }
   state.discountType = PERCENTAGE
-  state.discountAmount = 0
+  state.discount = 0
 };
 const soreableData = computed(()=> {
   const obj = {
@@ -55,7 +55,7 @@ const soreableData = computed(()=> {
     obj.discount_type = state.discountType
   }
   if (state.discountType) {
-    obj.discount_amount = state.discountAmount
+    obj.discount = state.discount
   }
   return obj
 })
@@ -129,7 +129,7 @@ const inputClass =
           <label class="text-gray-500">Discount amount</label>
           <input
             :class="inputClass"
-            v-model="state.discountAmount "
+            v-model="state.discount "
             type="number"
             placeholder="e.g. 10"
           />

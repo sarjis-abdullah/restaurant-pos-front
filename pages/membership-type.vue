@@ -76,7 +76,7 @@ const deleteRecord = async (id) => {
 const record = reactive({
   id: "",
   name: "",
-  // discount_amount: "",
+  // discount: "",
   // discount_type: "",
   // allow_separate_discount: false,
   default: false,
@@ -84,7 +84,7 @@ const record = reactive({
 const editRecord = (props) => {
   record.id = props.id;
   record.name = props.name;
-  //record.discount_amount = props.discount_amount;
+  //record.discount = props.discount;
   //record.discount_type = props.discount_type;
   //record.allow_separate_discount = props.allow_separate_discount;
   record.default = props.default ? true : false;
@@ -106,7 +106,7 @@ const isUpdating = ref(false);
 const updateableRecord = computed(() => {
   return {
     name: record.name,
-    // discount_amount: record.discount_amount,
+    // discount: record.discount,
     // discount_type: record.discount_type,
     // allow_separate_discount: record.allow_separate_discount,
     default: record.default,
@@ -128,7 +128,7 @@ const updateRecord = async (id) => {
       list.value = list.value.map((item) => {
         if (item.id == id) {
           item.name = record.name;
-          // item.discount_amount = res.data.discount_amount;
+          // item.discount = res.data.discount;
           // item.discount_type = record.discount_type;
           item.default = record.default;
           // item.allow_separate_discount = record.allow_separate_discount;
@@ -152,9 +152,9 @@ const updateRecord = async (id) => {
 
 const getDiscount = (item) => {
   if (item.discount_type == 'percentage') {
-    return parseInt(item.discount_amount) + '%'
+    return parseInt(item.discount) + '%'
   } else if (item.discount_type == 'flat') {
-    return '৳ ' + Number(parseFloat(item.discount_amount)).toFixed(2)
+    return '৳ ' + Number(parseFloat(item.discount)).toFixed(2)
   }
   return ''
 }
@@ -268,7 +268,7 @@ onMounted(() => {
                     <!-- <div v-if="singleData.editMode" class="mt-1 text-gray-500">
                       <input
                         :class="inputClass"
-                        v-model="record.discount_amount"
+                        v-model="record.discount"
                         type="text"
                         placeholder="e.g. Text about place"
                       />

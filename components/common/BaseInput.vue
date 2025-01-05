@@ -3,15 +3,17 @@
     :class="inputClass"
     :value="modelValue"
     @input="handleInput"
+    v-bind="$attrs"
     :type="type"
     :placeholder="placeholder"
+
   />
 </template>
 
 <script setup>
 defineProps({
   modelValue: {
-    type: String,
+    type: [String, Number],
     required: false,
     default: "",
   },
@@ -33,6 +35,9 @@ defineProps({
 const emit = defineEmits(["update:modelValue"]);
 
 function handleInput(evt) {
+  emit("update:modelValue", evt.target.value);
+}
+function change(evt) {
   emit("update:modelValue", evt.target.value);
 }
 </script>

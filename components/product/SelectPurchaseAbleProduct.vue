@@ -6,11 +6,6 @@ import { ProductService } from "~/services/ProductService";
 import { usePurchaseStore } from "~/stores/purchase";
 
 const props = defineProps({
-  modelValue: {
-    type: String,
-    required: false,
-    default: "",
-  },
   placeholder: {
     type: String,
     required: false,
@@ -41,6 +36,7 @@ const props = defineProps({
 const showOptions = ref(false);
 
 const chosenOption = ref("");
+const modelValue = ref("");
 const searchTerm = ref("");
 const inputRef = ref(null);
 
@@ -104,9 +100,23 @@ function handleInput(evt) {
 function handleClick(item) {
   emit("update:modelValue", item.number);
   emit("chosen", item);
+  modelValue.value = '';
   // chosenOption.value = item.number;
   showOptions.value = false;
-  purchaseStore.addToCart(item);
+  const product = {
+    ...item,
+    quantity: 0,
+    total: 0,
+    sobtotal: 0,
+    discount: 0,
+    tax: 0,
+    discountType: 'percentage',
+    taxType: 'percentage',
+    sellingPrice: 0,
+    purchasePrice: 0,
+  };
+  purchaseStore.addToCart(product);
+  searchResults.value = [];
   // inputRef.value?.focus();
   // $refs.input.focus();
 }
@@ -137,7 +147,7 @@ function handleOnblur() {
   >
     <div class="flex items-center justify-between">
       <input
-        :value="modelValue"
+        v-model="modelValue"
         @input="handleInput"
         @focus="handleFocus"
         @blur="handleOnblur"

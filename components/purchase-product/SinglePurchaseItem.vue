@@ -4,6 +4,7 @@ import {
   PencilIcon,
   CheckIcon,
   XMarkIcon,
+  EyeIcon
 } from "@heroicons/vue/20/solid";
 import PopupMenu from "@/components/common/Menu1.vue";
 import BaseSelect from "@/components/common/BaseSelect.vue";
@@ -60,13 +61,10 @@ const formatDateForInput = (date) => {
   const match = date.match(/^(\d{4}-\d{2}-\d{2})/);
   return match ? match[1] : "";
 };
-const editRecord = (props) => {
-  editMode.value = !editMode.value;
-  record.id = props.id;
-  record.name = props.name;
-  record.price = props.price;
-  record.type = props.type;
-  record.description = props.description;
+const router = useRouter()
+const viewRecord = (props) => {
+  const url = "/purchase-details/" + props.purchase_id
+  window.open(url, '_blank').focus();
 };
 const isUpdating = ref(false);
 const updateableRecord = computed(() => {
@@ -164,13 +162,13 @@ const closeModal = (id) => {
       <template v-if="editMode">
         <BaseInput v-model="record.type" placeholder="e.g. Color" />
       </template>
-      <span v-else class="text-gray-900"> {{ singleData?.tax_amount }}</span>
+      <span v-else class="text-gray-900"> {{ singleData?.tax }}</span>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm">
       <template v-if="editMode">
         <BaseInput v-model="record.type" placeholder="e.g. Color" />
       </template>
-      <span v-else class="text-gray-900"> {{ singleData?.discount_amount }}</span>
+      <span v-else class="text-gray-900"> {{ singleData?.discount }}</span>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm">
       <section class="flex gap-1 items-center justify-center">
@@ -179,9 +177,8 @@ const closeModal = (id) => {
           class="h-5 w-5"
           aria-hidden="true"
         />
-        <PencilIcon
-          v-if="!editMode"
-          @click="editRecord(singleData)"
+        <EyeIcon
+          @click="viewRecord(singleData)"
           class="h-5 w-5"
           aria-hidden="true"
         />

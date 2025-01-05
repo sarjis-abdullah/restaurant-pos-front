@@ -260,7 +260,7 @@
                           Number(
                             duePayment.payable_amount -
                               duePayment.paid_amount -
-                              membershipDiscountAmount
+                              membershipdiscount
                           ).toFixed(2)
                         }}</span>
                       </li>
@@ -363,7 +363,7 @@
                   </li>
                   <li
                     v-if="
-                      vehicle.membership?.membership_type?.discount_amount &&
+                      vehicle.membership?.membership_type?.discount &&
                       vehicle.membership?.membership_type?.discount_type !=
                         'free'
                     "
@@ -374,10 +374,10 @@
                       >{{
                         membershipHasPercentageDiscount
                           ? parseInt(
-                              vehicle.membership.membership_type.discount_amount
+                              vehicle.membership.membership_type.discount
                             ) ?? 0
                           : vehicle.membership.membership_type
-                              .discount_amount ?? 0
+                              .discount ?? 0
                       }}
                       <span v-if="membershipHasFlatDiscount">৳</span>
                       <span v-else-if="membershipHasPercentageDiscount">%</span>
@@ -591,7 +591,7 @@ const membershipHasPercentageDiscount = computed(() => {
   const type = vehicle.value?.membership?.membership_type?.discount_type;
   return type == "percentage";
 });
-const membershipDiscountAmount = computed(() => {
+const membershipdiscount = computed(() => {
   if (!parkingResponse.value || !totalParkingFees.value) {
     return 0;
   }
@@ -601,13 +601,13 @@ const membershipDiscountAmount = computed(() => {
   }
   let discount = 0;
   if (membership?.membership_type) {
-    const { discount_type, discount_amount } = membership.membership_type;
+    const { discount_type, discount } = membership.membership_type;
     if (discount_type == "percentage") {
-      if (discount_amount) {
-        discount = (totalParkingFees.value * parseFloat(discount_amount)) / 100;
+      if (discount) {
+        discount = (totalParkingFees.value * parseFloat(discount)) / 100;
       }
     } else if (discount_type == "flat") {
-      discount = parseFloat(discount_amount) ?? 0;
+      discount = parseFloat(discount) ?? 0;
     } else if (discount_type == "free") {
       discount = totalParkingFees.value;
     }
@@ -645,7 +645,7 @@ const calculatedCouponDiscount = computed(()=> {
 
 const totalDiscount = computed(()=> {
   let cDiscount = parseFloat(calculatedCouponDiscount.value?.value ?? 0)
-  return Math.floor(membershipDiscountAmount.value + cDiscount)
+  return Math.floor(membershipdiscount.value + cDiscount)
 })
 
 const finalTotalAmount = computed(()=> {
@@ -703,10 +703,10 @@ const listAllData = computed(() => {
     }
   ];
 
-  if (item?.vehicle?.status == 'checked_out' && item?.payment?.discount_amount) {
+  if (item?.vehicle?.status == 'checked_out' && item?.payment?.discount) {
     list.push({
       key: "Total discount",
-      value: "৳ " + item?.payment?.discount_amount
+      value: "৳ " + item?.payment?.discount
     })
 
     list.push({
@@ -722,7 +722,7 @@ const listAllData = computed(() => {
   }else {
     list.push({
       key: "Membership Discount",
-      value: "৳ " + Number(membershipDiscountAmount.value).toFixed(2),
+      value: "৳ " + Number(membershipdiscount.value).toFixed(2),
     })
   }
 
@@ -809,8 +809,8 @@ const parkingDataToCheckout = computed(() => {
       paid_amount: Math.round(receivedAmount.value),
       payable_amount: parseFloat(totalParkingFees.value),
       // payable_amount: finalTotalAmount.value,
-      discount_amount: parseFloat(calculatedCouponDiscount.value?.value ?? 0),
-      membership_discount: membershipDiscountAmount.value ?? 0,
+      discount: parseFloat(calculatedCouponDiscount.value?.value ?? 0),
+      membership_discount: membershipdiscount.value ?? 0,
     },
   };
   if (couponCodeResponse.value) {
@@ -821,7 +821,7 @@ const parkingDataToCheckout = computed(() => {
 const emailTemplate = ref(null);
 
 const subtotal = computed(() =>
-  Math.ceil(totalParkingFees.value - membershipDiscountAmount.value)
+  Math.ceil(totalParkingFees.value - membershipdiscount.value)
 );
 const checkoutLoading = ref(false);
 const confirmCheckout = async () => {
@@ -884,14 +884,14 @@ const disabledPaymentButton = computed(()=> {
 const payDue = async () => {
   const payable_amount = parseFloat(duePayment.value.payable_amount);
   const paid_amount = parseFloat(duePayment.value.paid_amount);
-  const remaining = payable_amount - paid_amount - membershipDiscountAmount.value;
+  const remaining = payable_amount - paid_amount - membershipdiscount.value;
   if (receivedAmount.value == remaining) {
     const obj = {
       paid_amount:
         parseFloat(receivedAmount.value) +
         parseFloat(duePayment.value.paid_amount),
       method: paymentMethod.value,
-      discount_amount: membershipDiscountAmount.value,
+      discount: membershipdiscount.value,
     };
     try {
       await PaymentService.update(duePayment.value.id, obj);

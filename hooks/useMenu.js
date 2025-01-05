@@ -79,15 +79,7 @@ export const useMenu = () => {
         children: [
           { name: "Add", href: "/add/purchase", icon: PlusIcon },
           { name: "List", href: "/purchase", icon: TableCellsIcon },
-        ],
-      },
-      {
-        name: "Purchase product",
-        href: "/purchase-product",
-        show: false,
-        children: [
-          { name: "Add", href: "/add/purchase-product", icon: PlusIcon },
-          { name: "List", href: "/purchase-product", icon: TableCellsIcon },
+          { name: "Products", href: "/purchase-product", icon: TableCellsIcon },
         ],
       },
       {

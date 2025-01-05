@@ -77,7 +77,7 @@ const downloadCsv = () => {
       Date: newObj.transaction_date,
       Payable: newObj.total_payable,
       Paid: newObj.total_paid,
-      Discount: newObj.discount_amount,
+      Discount: newObj.discount,
       Due: newObj.total_due,
       "Payment type": newObj.payment_type,
       Status: newObj.status,
@@ -124,7 +124,7 @@ const totals = computed(() => {
       acc.payable += parseFloat(payment.total_payable);
       // acc.paid += parseFloat(payment.total_paid);
       acc.due += parseFloat(payment.total_due);
-      acc.discount += parseFloat(payment.discount_amount);
+      acc.discount += parseFloat(payment.discount);
       acc.discount += parseFloat(payment.membership_discount);
     }
 
@@ -397,7 +397,7 @@ const totalPayableForSelectedTransaction = computed(() => {
     } else if (item.status != "success") {
       sum +=
         parseFloat(item.total_payable) -
-        parseFloat(item.discount_amount) -
+        parseFloat(item.discount) -
         parseFloat(item.membership_discount);
       continue;
     }
@@ -418,7 +418,7 @@ const removeSelectedVehicleId = () => {
   vehicleNumber.value = "";
 };
 const getPaidAmount = (item) => {
-  // const amount = parseFloat(item.total_paid) + parseFloat(item.discount_amount);
+  // const amount = parseFloat(item.total_paid) + parseFloat(item.discount);
   const amount = parseFloat(item.total_paid);
   return Number(amount).toFixed(2);
 };
@@ -1024,9 +1024,9 @@ onMounted(() => {
                   <span class="text-xs">Membership ৳ </span
                   >{{ item.membership_discount }}
                 </div>
-                <div v-if="item.discount_amount">
+                <div v-if="item.discount">
                   <span class="text-xs">Other ৳ </span
-                  >{{ item.discount_amount }}
+                  >{{ item.discount }}
                 </div>
               </div>
             </td>

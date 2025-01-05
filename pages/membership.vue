@@ -342,7 +342,7 @@ onMounted(() => {
                       <label class="text-gray-500">Marked as active</label>
                       <!-- <input
                         :class="inputClass"
-                        v-model="record.discount_amount"
+                        v-model="record.discount"
                         type="text"
                         placeholder="e.g. Text about place"
                       /> -->
