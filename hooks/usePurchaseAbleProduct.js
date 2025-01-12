@@ -9,10 +9,16 @@ export function usePurchaseAbleProduct(product = {}) {
   });
 
   const discountPerUnit = computed(() => {
+    const discount = parseFloat(product.discount || 0)
     if (product.discountType === "percentage") {
-      return (purchasePrice.value * parseFloat(product.discount || 0)) / 100;
+      return (purchasePrice.value * discount) / 100;
     }
-    return parseFloat(product.discount || 0);
+
+    const qty = parseFloat(product.quantity || 0);
+    if (qty <= 0) {
+      return discount;
+    }
+    return discount / qty;
   });
   const totalDiscount = computed(() => {
     return discountPerUnit.value * parseFloat(product.quantity || 0);
@@ -35,11 +41,17 @@ export function usePurchaseAbleProduct(product = {}) {
   const totalTax = computed(() => {
     return taxPerUnit.value * parseFloat(product.quantity || 0);
   });
+  const shippingCostPerUnit = computed(() => {
+    if (product.quantity <= 0 || product.allocatedShippingCost <= 0) {
+      return 0; 
+    }
+    return parseFloat(product.allocatedShippingCost) / parseFloat(product.quantity);
+  });
   const costPerUnit = computed(() => {
-    return purchasePrice.value - discountPerUnit.value + taxPerUnit.value;
+    return purchasePrice.value - discountPerUnit.value + taxPerUnit.value + shippingCostPerUnit.value;
   });
   const purchaseSubtotal = computed(() => {
-    return totalPurchasePrice.value - totalDiscount.value + totalTax.value;
+    return totalPurchasePrice.value - totalDiscount.value + totalTax.value + parseFloat(product.allocatedShippingCost || 0);
   });
 
   const profitPerItem = computed(() => {
@@ -72,6 +84,7 @@ export function usePurchaseAbleProduct(product = {}) {
     totalProfit,
     profitPercentage,
     taxType,
-    discountType
-  };
+    discountType,
+    shippingCostPerUnit,
+    };
 }

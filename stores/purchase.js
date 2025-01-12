@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { usePurchaseAbleProduct } from "~/hooks/usePurchaseAbleProduct";
 import { ProductService } from "~/services/ProductService";
 import { SupplierService } from "~/services/SupplierService";
 
@@ -6,12 +7,59 @@ export const usePurchaseStore = defineStore("purchase", {
   state: () => ({
     cartProducts: [],
     selectedItem: null,
+    allocatedShippingCost: 0,
   }),
   getters: {
-    // Example 3: Count of categories
-    // itemList(state) {
-    //   return state.cartProducts;
-    // },
+    purchaseDetails: (state) => () => {
+      let totalPurchasePriceAll = 0
+      let totalTaxAll = 0
+      let totalDiscountAll = 0
+      let purchaseSubtotalAll = 0
+      let totalQuantityAll = 0
+      const totalCardProducts = state.cartProducts?.length
+      for (let i = 0; i < totalCardProducts; i++) {
+        const el = state.cartProducts[i];
+        el.allocatedShippingCost = state.allocatedShippingCost;
+
+        const {
+          totalPurchasePrice, 
+          totalTax,
+          totalDiscount,
+          purchaseSubtotal
+        } = usePurchaseAbleProduct(el);
+
+        totalPurchasePriceAll += totalPurchasePrice.value;
+        totalTaxAll += totalTax.value;
+        totalDiscountAll += totalDiscount.value;
+        purchaseSubtotalAll += purchaseSubtotal.value;
+        totalQuantityAll += parseFloat(el.quantity || 0);
+      }
+      return {
+        totalCardProducts,
+        totalPurchasePriceAll,
+        totalTaxAll,
+        totalDiscountAll,
+        purchaseSubtotalAll,
+        totalQuantityAll,
+      }
+    },
+    purchaseProducts: (state) => () => {
+      return state.cartProducts?.map((el)=> {
+        const {
+          costPerUnit,
+        } = usePurchaseAbleProduct(el);
+        return {
+          quantity: el.quantity,
+          purchase_price: el.purchasePrice,
+          selling_price: el.sellingPrice,
+          cost_per_unit: costPerUnit.value,
+          tax: el.tax,
+          tax_type: el.taxType,
+          discount: el.discount,
+          discount_type: el.discountType,
+        }
+      })
+    },
   },
   actions: {
     async getProductsBy(query='') {
@@ -39,11 +87,8 @@ export const usePurchaseStore = defineStore("purchase", {
       console.log(index, key, value);
       this.cartProducts[index][key] = value; // Update specific field of the item
     },
-    decreaseCartItem(item) {
-      this.cartProducts.map((product) => {
-        product.id === item.id ? product.quantity -= 1 : product;
-        return product;
-      });
+    setAllocatedShippingCost(cost) {
+      this.allocatedShippingCost = cost;
     },
   },
 });

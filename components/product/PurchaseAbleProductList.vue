@@ -10,6 +10,12 @@ import { PurchaseService } from "~/services/PurchaseService";
 import { usePurchaseStore } from "~/stores/purchase";
 import Link from "../common/Link.vue";
 
+const props = defineProps({
+  allocatedShippingCost: {
+    type: Number,
+    default: 0,
+  },
+});
 const loadingError = ref(null);
 const isLoading = ref(true);
 
@@ -23,7 +29,7 @@ const total = ref(null);
 const totalPerPage = ref(null);
 const menuId = ref(null);
 const searchQuery = computed(() => {
-  const include = "&include=purchase.supplier,purchase.payments,purchase.due"
+  const include = "&include=purchase.supplier,purchase.payments,purchase.due";
   let query = `?page=${page.value}&per_page=${perPage.value}${include}`;
   if (menuId.value) {
     query += `&menu_id=${menuId.value}`;
@@ -32,7 +38,7 @@ const searchQuery = computed(() => {
 });
 const purchaseStore = usePurchaseStore();
 const list = computed(() =>
-purchaseStore?.cartProducts?.length ? purchaseStore.cartProducts : []
+  purchaseStore?.cartProducts?.length ? purchaseStore.cartProducts : []
 );
 
 const loadData = async () => {
@@ -98,7 +104,6 @@ onMounted(() => {
     <div class="flow-root">
       <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-          
           <div class="relative">
             <table
               class="min-w-full divide-y divide-gray-300"
@@ -140,13 +145,7 @@ onMounted(() => {
                     scope="col"
                     class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                  Purchase price
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                  >
-                  Selling price
+                    Purchase price
                   </th>
                   <th
                     scope="col"
@@ -176,6 +175,26 @@ onMounted(() => {
                     scope="col"
                     class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
+                    Shipping cost
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Cost/Unit
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Selling price
+                  </th>
+                  
+                  
+                  <th
+                    scope="col"
+                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  >
                     Subtotal
                   </th>
                   <th
@@ -193,7 +212,7 @@ onMounted(() => {
                 <SinglePurchaseAbleItem
                   v-for="(singleData, index) in list"
                   :key="singleData.id"
-                  :singleData="{...singleData, index}"
+                  :singleData="{ ...singleData, allocatedShippingCost, index }"
                 />
               </tbody>
             </table>

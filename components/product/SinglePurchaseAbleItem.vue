@@ -45,9 +45,11 @@ const record = reactive({
   sellingPrice: 0,
   tax: 0,
   discount: 0,
+  allocatedShippingCost: 0,
   discountType: "percentage",
   taxType: "percentage",
 });
+const allocatedShippingCost = ref(0)
 const {
   purchasePrice,
     totalPurchasePrice,
@@ -62,7 +64,8 @@ const {
     profitPercentage,
     taxType,
     discountType,
-} = usePurchaseAbleProduct(record);
+    shippingCostPerUnit,
+} = usePurchaseAbleProduct(record, allocatedShippingCost.value);
 
 const updateField = (key, value) => {
   console.log(singleData.index, key, value);
@@ -80,6 +83,19 @@ const closeModal = (id) => {
   showAddonModal.value = false;
   selectedAction.value = "";
 };
+
+watch(
+  () => singleData,
+  (newValue, oldValue) => {
+    if (newValue != oldValue) {
+      record.allocatedShippingCost = singleData?.allocatedShippingCost;
+      purchaseStore.setAllocatedShippingCost(record.allocatedShippingCost);
+    }
+  }, {
+    immediate: true,
+    deep: true,
+  }
+);
 
 </script>
 
@@ -135,16 +151,6 @@ const closeModal = (id) => {
       </template>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm border-r">
-      <template v-if="true">
-        <BaseInput
-          v-model="record.sellingPrice"
-          type="number"
-          placeholder="$10.00"
-          @input="updateField('sellingPrice', record.purchasePrice)"
-        />
-      </template>
-    </td>
-    <td class="whitespace-nowrap px-3 py-5 text-sm border-r">
       <span class="text-gray-900"> {{ totalPurchasePrice }}</span>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm border-r">
@@ -159,7 +165,7 @@ const closeModal = (id) => {
     <td class="whitespace-nowrap px-3 py-5 text-sm border-r">
       <!-- Discount -->
 
-      <div class="flex gap-1 justify-between items-center">
+      <div class="flex gap-1 flex-col justify-between items-center">
         <div>
           <BaseInput
             v-model="record.discount"
@@ -181,6 +187,7 @@ const closeModal = (id) => {
           </button>
           <button
             @click="toggleDiscountType('percentage')"
+            type="button"
             :class="
               record.discountType == 'percentage'
                 ? 'bg-[#0EB679] text-white'
@@ -197,10 +204,31 @@ const closeModal = (id) => {
       <template v-if="true">
         <BaseInput v-model="record.type" type="date" placeholder="e.g. Color" />
       </template>
-      <span v-else class="text-gray-900"> {{ singleData?.paid ?? 0 }}</span>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm border-r">
-      <span class="text-gray-900"> {{ purchaseSubtotal }}</span>
+      <span>
+        {{ singleData?.allocatedShippingCost }}
+      </span>
+    </td>
+    <td class="whitespace-nowrap px-3 py-5 text-sm border-r">
+      <span>
+        {{ Number(costPerUnit).toFixed(2) }}
+      </span>
+    </td>
+    <td class="whitespace-nowrap px-3 py-5 text-sm border-r">
+      <template v-if="true">
+        <BaseInput
+          v-model="record.sellingPrice"
+          type="number"
+          placeholder="$10.00"
+          @input="updateField('sellingPrice', record.purchasePrice)"
+        />
+      </template>
+    </td>
+    
+    
+    <td class="whitespace-nowrap px-3 py-5 text-sm border-r">
+      <span class="text-gray-900"> {{ Number(purchaseSubtotal).toFixed(2) }}</span>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm border-r">
       <span class="text-gray-900"> {{ profitPercentage }}</span>
