@@ -116,7 +116,7 @@ const storeData = computed(() => {
     purchase_date: state.date,
     branch_id: state.branch,
     status: state.status,
-    shipping_cost: 0,
+    shipping_cost: state.shippingCost,
     payment: {
       amount: state.payingAmount,
       method: state.paymentMethod,
@@ -180,7 +180,7 @@ const inputClass =
         </div>
         <div class="grid gap-2">
           <label class="text-gray-500">
-            Purchase date<span class="text-red-500">*</span>
+            Product name<span class="text-red-500">*</span>
           </label>
           <SelectPurchaseAbleProduct />
         </div>

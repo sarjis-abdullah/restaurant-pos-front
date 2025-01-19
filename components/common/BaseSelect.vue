@@ -8,6 +8,7 @@
     :style="{ background: backgroundStyle }"
     :value="modelValue"
     @change="onChange"
+    v-bind="$attrs"
   >
     <option v-if="placeholder" :disabled="true" :value="optionDefaultValue">
       {{ placeholder }}

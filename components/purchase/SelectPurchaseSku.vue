@@ -5,21 +5,24 @@
 <script setup>
 import BaseSelect from "~/components/common/BaseSelect.vue";
 
+defineProps({
+  stocks: {
+    type: Array,
+    required: true,
+    default: [],
+  },
+});
 const emit = defineEmits([""]);
 const options = computed(() =>{
   return [
     {
-      id: 'Received',
-      name: "Received",
+      id: 'autoSku',
+      name: "Auto",
     },
     {
-      id: 'Pending',
-      name: "Pending",
+      id: 'customSku',
+      name: "Custom",
     },
-    {
-      id: 'Ordered',
-      name: "Ordered",
-    }
   ]
 }
 );

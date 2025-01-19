@@ -48,7 +48,8 @@ export const usePurchaseStore = defineStore("purchase", {
         const {
           costPerUnit,
         } = usePurchaseAbleProduct(el);
-        return {
+        const obj = {
+          product_id: el.id,
           quantity: el.quantity,
           purchase_price: el.purchasePrice,
           selling_price: el.sellingPrice,
@@ -57,7 +58,16 @@ export const usePurchaseStore = defineStore("purchase", {
           tax_type: el.taxType,
           discount: el.discount,
           discount_type: el.discountType,
+          expire_date: el.exipreDate,
+          allocated_shipping_cost: el.allocatedShippingCost,
         }
+        if (el.stockId) {
+          obj.stock_id = el.stockId;
+          
+        } else {
+          obj.sku = el.sku;
+        }
+        return obj
       })
     },
   },

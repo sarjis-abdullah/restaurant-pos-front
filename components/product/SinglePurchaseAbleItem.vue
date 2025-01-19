@@ -13,6 +13,7 @@ import ServerError from "@/components/common/Error.vue";
 import Loader from "@/components/common/Loading.vue";
 import MenuItemVariantList from "@/components/menu-item/variant/AddVariantList.vue";
 import MenuItemAddonList from "@/components/menu-item/addon/AddAddonList.vue";
+import SelectPurchaseSku from "@/components/purchase/SelectPurchaseSku.vue";
 import { PurchaseProductService } from "~/services/PurchaseProductService";
 import { usePayments } from "~/hooks/usePayments";
 import { usePurchaseAbleProduct } from "~/hooks/usePurchaseAbleProduct";
@@ -43,30 +44,62 @@ const record = reactive({
   quantity: 0,
   purchasePrice: 0,
   sellingPrice: 0,
+  sku: "",
+  stockId: null,
+  exipreDate: null,
   tax: 0,
   discount: 0,
   allocatedShippingCost: 0,
   discountType: "percentage",
   taxType: "percentage",
 });
-const allocatedShippingCost = ref(0)
+const selectedSku = ref("");
+const handleSkuChange = (value) => {
+  console.log(value);
+  if (value == "customSku") {
+    record.sku = "";
+  } else if (value == "autoSku") {
+    record.sku = value;
+  } else {
+    record.sku = "";
+    record.stockId = value;
+  }
+  // record.stockId = value;
+  // updateField("stockId", value);
+};
+
 const {
   purchasePrice,
-    totalPurchasePrice,
-    discountPerUnit,
-    totalDiscount,
-    taxPerUnit,
-    totalTax,
-    costPerUnit,
-    purchaseSubtotal,
-    profitPerItem,
-    totalProfit,
-    profitPercentage,
-    taxType,
-    discountType,
-    shippingCostPerUnit,
-} = usePurchaseAbleProduct(record, allocatedShippingCost.value);
-
+  totalPurchasePrice,
+  discountPerUnit,
+  totalDiscount,
+  taxPerUnit,
+  totalTax,
+  costPerUnit,
+  purchaseSubtotal,
+  profitPerItem,
+  totalProfit,
+  profitPercentage,
+  taxType,
+  discountType,
+  shippingCostPerUnit,
+} = usePurchaseAbleProduct(record);
+const purchseData = computed(() => {
+  return {
+    product_id: singleData.id,
+    quantity: record.quantity,
+    purchase_price: record.purchasePrice,
+    selling_price: record.sellingPrice,
+    sku: record.sku,
+    stock_id: record.stockId,
+    tax: record.tax,
+    discount: record.discount,
+    cost_per_unit: costPerUnit.value,
+    allocated_shipping_cost: record.allocatedShippingCost,
+    discount_type: record.discountType,
+    tax_type: record.taxType,
+  };
+});
 const updateField = (key, value) => {
   console.log(singleData.index, key, value);
   // 'update', this.index, key, value
@@ -83,7 +116,6 @@ const closeModal = (id) => {
   showAddonModal.value = false;
   selectedAction.value = "";
 };
-
 watch(
   () => singleData,
   (newValue, oldValue) => {
@@ -91,12 +123,12 @@ watch(
       record.allocatedShippingCost = singleData?.allocatedShippingCost;
       purchaseStore.setAllocatedShippingCost(record.allocatedShippingCost);
     }
-  }, {
+  },
+  {
     immediate: true,
     deep: true,
   }
 );
-
 </script>
 
 <template>
@@ -121,10 +153,23 @@ watch(
       </section>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm border-r">
-      <template v-if="editMode">
-        <BaseInput v-model="record.type" placeholder="e.g. Color" />
+      <template v-if="selectedSku == 'customSku'">
+        <BaseInput
+          v-model="record.sku"
+          placeholder="e.g. Sku"
+          class="min-w-[5rem]"
+          @input="updateField('sku', record.sku)"
+        />
       </template>
-      <span v-else class="text-gray-900"> {{ "sku" }}</span>
+      <span>
+        <SelectPurchaseSku
+          v-model="selectedSku"
+          @change="handleSkuChange"
+          :stocks="singleData.stocks"
+          class="min-w-[5rem]"
+        />
+      </span>
+      <!-- <span v-else class="text-gray-900"> {{ "sku" }}</span> -->
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm border-r">
       <div v-if="true" class="flex items-center gap-1">
@@ -138,7 +183,6 @@ watch(
         </div>
         <div>/{{ singleData.unit }}</div>
       </div>
-      <span v-else class="text-gray-900"> {{ "sku" }}</span>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm border-r">
       <template v-if="true">
@@ -201,9 +245,13 @@ watch(
       </div>
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm border-r">
-      <template v-if="true">
-        <BaseInput v-model="record.type" type="date" placeholder="e.g. Color" />
-      </template>
+      <BaseInput
+        v-model="record.exipreDate"
+        type="date"
+        placeholder="e.g. Color"
+        class="max-w-[8rem]"
+        @change="updateField('exipreDate', record.exipreDate)"
+      />
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm border-r">
       <span>
@@ -221,14 +269,15 @@ watch(
           v-model="record.sellingPrice"
           type="number"
           placeholder="$10.00"
-          @input="updateField('sellingPrice', record.purchasePrice)"
+          @input="updateField('sellingPrice', record.sellingPrice)"
         />
       </template>
     </td>
-    
-    
+
     <td class="whitespace-nowrap px-3 py-5 text-sm border-r">
-      <span class="text-gray-900"> {{ Number(purchaseSubtotal).toFixed(2) }}</span>
+      <span class="text-gray-900">
+        {{ Number(purchaseSubtotal).toFixed(2) }}</span
+      >
     </td>
     <td class="whitespace-nowrap px-3 py-5 text-sm border-r">
       <span class="text-gray-900"> {{ profitPercentage }}</span>

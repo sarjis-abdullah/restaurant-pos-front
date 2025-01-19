@@ -114,6 +114,9 @@ function handleClick(item) {
     taxType: 'percentage',
     sellingPrice: 0,
     purchasePrice: 0,
+    exipreDate: null,
+    sku: "",
+    stockId: null,
   };
   purchaseStore.addToCart(product);
   searchResults.value = [];
