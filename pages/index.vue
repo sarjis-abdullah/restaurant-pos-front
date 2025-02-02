@@ -6,6 +6,6 @@
 import { ref } from "vue";
 import Login from "../components/Login.vue";
 definePageMeta({
-  layout:"empty",
+  layout:"",
 });
 </script>
