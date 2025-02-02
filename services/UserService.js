@@ -11,7 +11,7 @@ export class UserService {
   }
   static async create(data) {
     try {
-      return await HttpRequester.post('register', data);
+      return await HttpRequester.post('user', data);
     } catch (err) {
       throw err;
     }
