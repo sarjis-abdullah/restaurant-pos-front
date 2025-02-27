@@ -1,159 +1,155 @@
 <template>
-    <div class="container mx-auto p-6">
-      <h1 class="text-2xl font-bold mb-4">Branch List</h1>
-  
-      <!-- Loading State -->
-      <p v-if="loading" class="text-blue-500">Loading branches...</p>
-  
-      <!-- Error State -->
-      <p v-if="loadingError" class="text-red-500">Failed to load branches.</p>
-  
-      <!-- Success/Failure Message -->
-      <p v-if="message" class="text-green-500">{{ message }}</p>
-  
-      <!-- Branch List -->
-      <table v-if="!loading && branches.length" class="w-full border-collapse border border-gray-300">
-        <thead>
-          <tr class="bg-gray-200">
-            <th class="border px-4 py-2">ID</th>
-            <th class="border px-4 py-2">Name</th>
-            <th class="border px-4 py-2">Status</th> <!-- Displaying Status -->
-            <th class="border px-4 py-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="branch in branches" :key="branch.id">
-            <td class="border px-4 py-2">{{ branch.id }}</td>
-            <td class="border px-4 py-2">
-              <input v-if="branch.editing" v-model="branch.name" class="border p-1 w-full" />
-              <span v-else>{{ branch.name }}</span>
-            </td>
-            <td class="border px-4 py-2">
-              <input v-if="branch.editing" v-model="branch.status" class="border p-1 w-full" /> <!-- Editing Status -->
-              <span v-else>{{ branch.status }}</span>
-            </td>
-            <td class="border px-4 py-2">
-              <button 
-                @click="editBranch(branch)" 
-                class="bg-yellow-500 text-white px-2 py-1 rounded mx-1"
-                :disabled="updating"
-              >
-                {{ branch.editing ? "Save" : "Edit" }}
-              </button>
-              <button 
-                @click="deleteBranch(branch)" 
-                class="bg-red-500 text-white px-2 py-1 rounded mx-1"
-                :disabled="deleting"
-              >
-                Delete
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-  
-      <!-- No Data Message -->
-      <p v-else-if="!loading" class="text-red-500">No branches found.</p>
+  <div class="rounded-lg bg-slate-[#A8A8A8] shadow-lg p-6">
+    <div class="md:mt-8 flow-root">
+      <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+        <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+          <Titlebar title="branch"></Titlebar>
+
+          <div v-if="!loadingError && !isLoading">
+            <table class="min-w-full divide-y divide-gray-300" v-if="branches.length > 0">
+              <thead>
+                <tr>
+                  <th class="py-3.5 pl-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">Name</th>
+                  <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Type</th>
+                  <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Company ID</th>
+                  <th class="relative py-3.5 pl-3 pr-4 sm:pr-0">Action</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200 bg-white">
+                <tr v-for="branch in branches" :key="branch.id">
+                  <td class="whitespace-nowrap px-3 py-5 text-sm text-gray-900">{{ branch.name }}</td>
+                  <td class="whitespace-nowrap px-3 py-5 text-sm text-gray-900">{{ branch.type }}</td>
+                  <td class="whitespace-nowrap px-3 py-5 text-sm text-gray-900">{{ branch.company_id }}</td>
+                  <td class="flex justify-center gap-1 relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+                    <TrashIcon
+                      @click="deleteBranch(branch)"
+                      class="h-5 w-5 text-red-500 cursor-pointer"
+                      aria-hidden="true"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div v-else class="text-center py-10">
+              <p class="text-xl text-gray-400">No branches found</p>
+            </div>
+          </div>
+
+          <div v-if="isLoading" class="text-center py-10">
+            <Loading />
+          </div>
+
+          <div v-if="loadingError" class="text-center py-10 text-red-500">
+            Failed to load branches.
+          </div>
+        </div>
+      </div>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref, onMounted } from "vue";
-  import { BranchService } from "@/services/BranchService";
-  import { useFetch } from "#app";
-  
-  // Page meta
-  definePageMeta({
-    layout: "auth-layout",
-  });
-  
-  // Reactive state
-  const branches = ref([]);
-  const loading = ref(true);
-  const loadingError = ref(false);
-  const message = ref("");
-  const updating = ref(false);
-  const deleting = ref(false);
-  
-  // Fetch branches when the component is mounted
-  onMounted(fetchBranches);
-  
-  async function fetchBranches() {
-    try {
-      const response = await BranchService.getAll();
-      console.log("Branches:", response);
-  
-      // Ensure data is an array before setting it
-      branches.value = Array.isArray(response.data) ? response.data : [];
-  
-      // Add editing property for inline editing
-      branches.value = branches.value.map((branch) => ({
-        ...branch,
-        editing: false,
-      }));
-    } catch (err) {
-      loadingError.value = true;
-      console.error("Error loading branches:", err);
-    }
-    loading.value = false;
+
+    <ServerError :error="serverErrors" />
+
+    <Pagination
+      class="mt-6"
+      :perPage="perPage"
+      :lastPage="lastPage"
+      :total="total"
+      :totalPerPage="totalPerPage"
+      @onChange="onPageChanged"
+    />
+    <Loading v-if="isLoading || deleting" />
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from "vue";
+import { BranchService } from "@/services/BranchService";
+import Titlebar from "@/components/common/Titlebar.vue";
+import Pagination from "@/components/common/Pagination.vue";
+import Loading from "@/components/common/Loading.vue";
+import ServerError from "@/components/common/Error.vue";
+import { TrashIcon } from "@heroicons/vue/20/solid";
+
+// Page meta
+definePageMeta({
+  layout: "auth-layout",
+});
+
+// Reactive state
+const branches = ref([]);
+const loading = ref(true);
+const loadingError = ref(false);
+const message = ref("");
+const deleting = ref(false);
+
+// Pagination
+const page = ref(1);
+const perPage = ref(10);
+const lastPage = ref(null);
+const total = ref(null);
+const totalPerPage = ref(null);
+
+const searchQuery = computed(() => {
+  return `?page=${page.value}&per_page=${perPage.value}`;
+});
+
+// Fetch branches when the component is mounted
+onMounted(() => {
+  fetchBranches();
+});
+
+async function fetchBranches() {
+  try {
+    loading.value = true;
+    const response = await BranchService.getAll(searchQuery.value);
+    branches.value = Array.isArray(response.data) ? response.data : [];
+
+    const { meta } = response;
+    page.value = meta.current_page;
+    lastPage.value = meta.last_page;
+    total.value = meta.total;
+    totalPerPage.value = branches.value.length;
+  } catch (err) {
+    loadingError.value = true;
+    console.error("Error loading branches:", err);
   }
-  
-  async function editBranch(branch) {
-    if (branch.editing) {
-      await updateBranch(branch);
-    }
-    branch.editing = !branch.editing; // Toggle the editing mode
+  loading.value = false;
+}
+
+async function deleteBranch(branch) {
+  if (deleting.value) return;
+  if (!confirm("Are you sure you want to delete this branch?")) return;
+
+  deleting.value = true;
+  try {
+    await BranchService.delete(branch.id);
+    fetchBranches(); // Re-fetch branches to ensure consistency
+    message.value = "Branch deleted successfully!";
+    // setTimeout(() => {
+    //   message.value = ""; // Reset message after 3 seconds
+    // }, 3000);
+  } catch (err) {
+    console.error("Error deleting branch:", err);
+    message.value = "Failed to delete branch.";
+    // setTimeout(() => {
+    //   message.value = ""; // Reset message after 3 seconds
+    // }, 3000);
+  } finally {
+    deleting.value = false;
   }
-  
-  async function updateBranch(branch) {
-    if (updating.value) return; // Prevent multiple update requests
-  
-    updating.value = true;
-    try {
-      await BranchService.put(branch.id, {
-        name: branch.name,
-        status: branch.status, // Include status in the update
-      });
-  
-      // Update the branch locally
-      branch.editing = false;
-      message.value = "Branch updated successfully!";
-    } catch (err) {
-      console.error("Error updating branch:", err);
-      message.value = "Failed to update branch.";
-    } finally {
-      updating.value = false;
-    }
-  }
-  
-  async function deleteBranch(branch) {
-    if (deleting.value) return; // Prevent multiple delete requests
-    if (!confirm("Are you sure you want to delete this branch?")) return;
-  
-    deleting.value = true;
-    try {
-      await BranchService.delete(branch.id);
-  
-      // Remove branch from list
-      branches.value = branches.value.filter((b) => b.id !== branch.id);
-  
-      message.value = "Branch deleted successfully!";
-    } catch (err) {
-      console.error("Error deleting branch:", err);
-      message.value = "Failed to delete branch.";
-    } finally {
-      deleting.value = false;
-    }
-  }
-  </script>
-  
-  <style scoped>
-  button:hover {
-    opacity: 0.8;
-  }
-  button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  </style>
-  
+}
+
+const onPageChanged = (p) => {
+  page.value = p;
+  fetchBranches();
+};
+</script>
+
+<style scoped>
+button:hover {
+  opacity: 0.8;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+</style>

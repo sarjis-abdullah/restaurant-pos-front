@@ -1,94 +1,110 @@
 <template>
-    <div class="container mx-auto p-6">
-      <h1 class="text-2xl font-bold mb-4">Add Branch</h1>
-  
-      <!-- Success & Error Messages -->
-      <p v-if="message" class="text-green-500">{{ message }}</p>
-      <p v-if="error" class="text-red-500">{{ error }}</p>
-  
-      <form @submit.prevent="createBranch" class="space-y-4">
-        <div>
-          <label class="block font-semibold">Branch Name:</label>
-          <input v-model="branch.name" type="text" class="border p-2 w-full" required />
+  <section class="rounded-lg bg-slate-[#A8A8A8] shadow-lg p-6">
+    <header class="hidden md:flex justify-between text-gray-900 mb-3 text-xl">
+      <h6 class="hidden md:inline-block capitalize">Add Branch</h6>
+    </header>
+
+    <form @submit.prevent="createBranch" ref="formRef" class="grid gap-3">
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="grid gap-2">
+          <label class="text-gray-500">Branch Name<span class="text-red-500">*</span></label>
+          <BaseInput v-model="branch.name" placeholder="Branch name" />
         </div>
-  
-        <div>
-          <label class="block font-semibold">Location:</label>
-          <input v-model="branch.location" type="text" class="border p-2 w-full" required />
+        <div class="grid gap-2">
+          <label class="text-gray-500">Company ID<span class="text-red-500">*</span></label>
+          <BaseInput v-model="branch.company_id" type="number" placeholder="Company ID" />
         </div>
-  
-        <div>
-          <label class="block font-semibold">Type:</label>
-          <input v-model="branch.type" type="text" class="border p-2 w-full" required />
+        <div class="grid gap-2">
+          <label class="text-gray-500">Type<span class="text-red-500">*</span></label>
+          <BaseInput v-model="branch.type" placeholder="Branch Type" />
         </div>
-  
-        <div>
-          <label class="block font-semibold">Company ID:</label>
-          <input v-model="branch.company_id" type="number" class="border p-2 w-full" required />
+      </section>
+
+      <ServerError :error="serverErrors" />
+      <ClientErrors :errors="validator.$errors" />
+
+      <section>
+        <div class="flex justify-end gap-2">
+          <button
+            type="button"
+            class="bg-gray-400 text-white px-2 py-1 rounded-md"
+            @click="handleReset"
+          >
+            Reset
+          </button>
+          <SpinnerButton type="submit" :loading="loading"></SpinnerButton>
         </div>
-  
-        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">
-          Create Branch
-        </button>
-      </form>
-    </div>
-  </template>
-  
-  <script setup>
-  import { ref } from "vue";
-  import { useFetch } from "#app";
-  
-  // Page meta
-  definePageMeta({
-    layout: "auth-layout",
-  });
-  
-  // Reactive state
-  const branch = ref({
-    name: "",
-    location: "",
-    type: "",
-    company_id: null,
-  });
-  
-  const message = ref("");
-  const error = ref("");
-  
-  // Form submission handler
-  const createBranch = async () => {
-    try {
-      // Validate required fields
-      if (!branch.value.name || !branch.value.location || !branch.value.type || !branch.value.company_id) {
-        error.value = "All fields are required.";
-        return;
-      }
-  
-      // Send request using useFetch
-      const { data, error: fetchError } = await useFetch("http://localhost:8199/api/v1/branch", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: branch.value,
-      });
-  
-      if (fetchError.value) {
-        throw fetchError.value;
-      }
-  
-      message.value = "Branch created successfully!";
-      error.value = "";
-      branch.value = { name: "", location: "", type: "", company_id: null }; // Reset form
-    } catch (err) {
-      error.value = err?.data?.message || "Failed to create branch.";
-      console.error("Error creating branch:", err);
-    }
-  };
-  </script>
-  
-  <style scoped>
-  button:hover {
-    opacity: 0.8;
+      </section>
+    </form>
+  </section>
+</template>
+
+<script setup>
+import { ref, reactive, computed } from "vue";
+import { useVuelidate } from "@vuelidate/core";
+import { required, helpers } from "@vuelidate/validators";
+import BaseInput from "@/components/common/BaseInput.vue";
+import SpinnerButton from "@/components/common/SpinnerButton.vue";
+import ClientErrors from "@/components/common/ClientErrors.vue";
+import ServerError from "@/components/common/Error.vue";
+import { useFetch } from "#app";
+import { useToast } from "vue-toastification"; // Import Toast
+
+// Page meta
+definePageMeta({
+  layout: "auth-layout",
+});
+
+const toast = useToast(); // Initialize toast
+const serverErrors = ref({});
+const loading = ref(false);
+
+const branch = reactive({
+  name: "",
+  company_id: null,
+  type: "",
+});
+
+const rules = computed(() => ({
+  name: { required: helpers.withMessage("Branch Name is required", required) },
+  company_id: { required: helpers.withMessage("Company ID is required", required) },
+  type: { required: helpers.withMessage("Type is required", required) },
+}));
+
+const validator = useVuelidate(rules, branch, { $lazy: true });
+
+const handleReset = async () => {
+  await validator.value.$reset();
+  branch.name = "";
+  branch.company_id = null;
+  branch.type = "";
+  serverErrors.value = {};
+};
+
+const createBranch = async () => {
+  const valid = await validator.value.$validate();
+  if (!valid) return;
+
+  try {
+    loading.value = true;
+    const { data, error: fetchError } = await useFetch("http://localhost:8199/api/v1/branch", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer 31|FU6SufLuOdPfphDe8jF2MLvFKp6RRLF77t5tkPeo876a90e2",
+      },
+      body: branch,
+    });
+
+    if (fetchError.value) throw fetchError.value;
+
+    handleReset();
+    toast.success("Branch created successfully!"); // Success toast
+  } catch (error) {
+    serverErrors.value = error.errors || { general: "Failed to create branch." };
+    toast.error("Error creating branch. Please try again."); // Error toast
+  } finally {
+    loading.value = false;
   }
-  </style>
-  
+};
+</script>
