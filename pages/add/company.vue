@@ -54,15 +54,7 @@
   
   const validator = useVuelidate(rules, company, { $lazy: true });
   
-  // Fetch all companies
-  const fetchCompanies = async () => {
-    try {
-      const response = await CompanyService.getAll();
-      companies.value = response.data || [];
-    } catch (error) {
-      toast.error("Failed to fetch companies.");
-    }
-  };
+ 
   
   // Reset form
   const handleReset = async () => {
@@ -82,7 +74,7 @@
       await CompanyService.create(company);
       handleReset();
       toast.success("Company created successfully!");
-      fetchCompanies(); // Refresh company list
+      // fetchCompanies(); // Refresh company list
     } catch (error) {
       serverErrors.value = error?.response?.data || { general: "Failed to create company." };
       toast.error("Error creating company. Please try again.");
@@ -91,20 +83,7 @@
     }
   };
   
-  // Delete company
-  const deleteCompany = async (id) => {
-    if (!confirm("Are you sure you want to delete this company?")) return;
-    try {
-      await CompanyService.delete(id);
-      toast.success("Company deleted successfully!");
-      fetchCompanies(); // Refresh list
-    } catch (error) {
-      toast.error("Failed to delete company.");
-    }
-  };
   
-  // Fetch companies on mount
-  onMounted(fetchCompanies);
   
   </script>
   
