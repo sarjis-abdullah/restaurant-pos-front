@@ -4,14 +4,10 @@ import Link from "@/components/common/Link.vue";
 import Pagination from "@/components/common/Pagination.vue";
 import Titlebar from "@/components/common/Titlebar.vue";
 import { CompanyService } from "@/services/CompanyService.js";
-import {
-  TrashIcon,
-  PencilIcon,
-  CheckIcon,
-  XMarkIcon,
-} from "@heroicons/vue/20/solid";
+import { TrashIcon,PencilIcon, CheckIcon, XMarkIcon } from "@heroicons/vue/20/solid";
 import Loading from "@/components/common/Loading.vue";
 import ServerError from "@/components/common/Error.vue";
+import DeleteModal from "~/components/DeleteModal.vue";
 
 definePageMeta({
   layout: "auth-layout",
@@ -23,6 +19,7 @@ const inputClass =
 const list = ref([]);
 const loadingError = ref(null);
 const isLoading = ref(true);
+const isDeleting = ref(false);
 const serverErrors = ref(null);
 
 // Pagination
@@ -55,23 +52,37 @@ const loadData = async () => {
   }
 };
 
-const isDeleting = ref(false);
-const deleteRecord = async (id) => {
-  if (confirm("Are you sure you want to delete this record?")) {
+// Delete Modal Logic
+const showDeleteModal = ref(false);
+const selectedItemId = ref(null);
+
+const openDeleteModal = (id) => {
+  selectedItemId.value = id;
+  showDeleteModal.value = true;
+};
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false;
+  selectedItemId.value = null;
+};
+
+const confirmDelete = async () => {
+  if (selectedItemId.value) {
     try {
       isDeleting.value = true;
-      await CompanyService.delete(id);
-      list.value = list.value.filter((item) => item.id !== id);
-
+      await CompanyService.delete(selectedItemId.value);
+      list.value = list.value.filter((item) => item.id !== selectedItemId.value);
       serverErrors.value = {};
     } catch (error) {
       serverErrors.value = error.errors;
     } finally {
       isDeleting.value = false;
+      closeDeleteModal();
     }
   }
 };
 
+// Editing logic
 const record = reactive({
   id: "",
   name: "",
@@ -80,26 +91,16 @@ const record = reactive({
 const editRecord = (props) => {
   record.id = props.id;
   record.name = props.name;
-  list.value = list.value.map((item) => {
-    if (item.id === props.id) {
-      return {
-        ...item,
-        editMode: true,
-      };
-    }
-    return {
-      ...item,
-      editMode: false,
-    };
-  });
+  list.value = list.value.map((item) => ({
+    ...item,
+    editMode: item.id === props.id,
+  }));
 };
 
 const isUpdating = ref(false);
-const updateableRecord = computed(() => {
-  return {
-    name: record.name,
-  };
-});
+const updateableRecord = computed(() => ({
+  name: record.name,
+}));
 
 const cancelUpdatingRecord = () => {
   list.value = list.value.map((item) => ({
@@ -111,23 +112,12 @@ const cancelUpdatingRecord = () => {
 const updateRecord = async (id) => {
   try {
     isUpdating.value = true;
-    console.log("Payload being sent:", updateableRecord.value);
-    
     const res = await CompanyService.put(id, updateableRecord.value);
-    console.log("Update response:", res);
-
-    list.value = list.value.map((item) => {
-      if (item.id === id) {
-        item.name = record.name;
-        item.editMode = false;
-        return item;
-      }
-      return item;
-    });
-
+    list.value = list.value.map((item) =>
+      item.id === id ? { ...item, name: record.name, editMode: false } : item
+    );
     serverErrors.value = {};
   } catch (error) {
-    console.error("Update error:", error.response?.data || error);
     serverErrors.value = error.errors;
   } finally {
     isUpdating.value = false;
@@ -143,41 +133,29 @@ onMounted(() => {
   loadData();
 });
 </script>
-
 <template>
   <div class="rounded-lg bg-slate-[#A8A8A8] shadow-lg p-6">
     <div class="md:mt-8 flow-root">
       <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-          <Titlebar title="company"></Titlebar>
+          <Titlebar title="Company"></Titlebar>
 
           <div v-if="!loadingError && !isLoading">
-            <table
-              class="min-w-full divide-y divide-gray-300"
-              v-if="list && list.length > 0"
-            >
+            <table v-if="list.length > 0" class="min-w-full divide-y divide-gray-300">
               <thead>
                 <tr>
-                  <th
-                    scope="col"
-                    class="py-3.5 pl-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
-                  >
+                  <th class="py-3.5 pl-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">
                     Name
                   </th>
-                  <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
-                    Action
-                  </th>
+                  <th class="relative py-3.5 pl-3 pr-4 sm:pr-0">Action</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 bg-white">
                 <tr v-for="singleData in list" :key="singleData.id">
                   <td class="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
                     <div class="flex items-center">
-                      <div class="">
-                        <div
-                          v-if="singleData.editMode"
-                          class="mt-1 text-gray-500"
-                        >
+                      <div>
+                        <div v-if="singleData.editMode">
                           <input
                             :class="inputClass"
                             v-model="record.name"
@@ -191,48 +169,41 @@ onMounted(() => {
                       </div>
                     </div>
                   </td>
-                  <td
-                    class="flex justify-center gap-1 relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"
-                  >
-                    <TrashIcon
-                      @click="deleteRecord(singleData.id)"
-                      class="h-5 w-5 cursor-pointer text-red-500"
-                      aria-hidden="true"
-                    />
+                  <td class="flex justify-center gap-1 whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                     <PencilIcon
                       @click="editRecord(singleData)"
                       class="h-5 w-5 cursor-pointer text-blue-500"
                       aria-hidden="true"
                     />
                     <CheckIcon
-                      v-if="singleData?.editMode"
+                      v-if="singleData.editMode"
                       @click="updateRecord(singleData.id)"
                       class="h-5 w-5 text-green-500 cursor-pointer"
                       aria-hidden="true"
                     />
                     <XMarkIcon
-                      v-if="singleData?.editMode"
-                      @click="cancelUpdatingRecord(singleData.id)"
+                      v-if="singleData.editMode"
+                      @click="cancelUpdatingRecord"
                       class="h-5 w-5 text-gray-500 cursor-pointer"
                       aria-hidden="true"
                     />
+                    <button
+                      @click="openDeleteModal(singleData.id)"
+                      class="text-red-500 hover:text-red-700"
+                    >
+                     <TrashIcon  class="h-5 w-5"/>
+                    </button>
                   </td>
                 </tr>
               </tbody>
             </table>
             <div v-else class="text-center py-10">
-              <p class="text-xl text-gray-400">
-                No data available
-              </p>
+              <p class="text-xl text-gray-400">No data available</p>
             </div>
           </div>
 
-          <div v-if="!loadingError && isLoading">
-            <Loading />
-          </div>
-          <div v-if="loadingError && !isLoading">
-            Loading error
-          </div>
+          <div v-if="isLoading"><Loading /></div>
+          <div v-if="loadingError">Loading error</div>
         </div>
       </div>
     </div>
@@ -247,5 +218,8 @@ onMounted(() => {
       :totalPerPage="totalPerPage"
       @onChange="onPageChanged"
     />
+
+    <!-- Global Delete Modal -->
+    <DeleteModal :isOpen="showDeleteModal" @confirm="confirmDelete" @close="closeDeleteModal" />
   </div>
 </template>
