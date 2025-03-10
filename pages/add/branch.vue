@@ -17,7 +17,7 @@
         </div>
         <div class="grid gap-2">
           <label class="text-gray-500">Type<span class="text-red-500">*</span></label>
-          <SelectBranch v-model="branch.type" placeholder="Branch Type" />
+          <BaseInput v-model="branch.type" placeholder="Branch Type" />
         </div>
       </section>
 
