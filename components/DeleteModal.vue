@@ -46,8 +46,20 @@ const emit = defineEmits(["confirm", "close"]);
 const isDeleting = ref(false);
 
 const confirmDelete = async () => {
-  isDeleting.value = true;
-  emit("confirm", props.itemId);
+  try{
+    isDeleting.value = true;
+    emit("confirm", props.itemId);
+  }
+  catch(error){
+    console.error(error);
+    isDeleting.value = false;
+  }
+  finally{
+    setTimeout(() => {
+      isDeleting.value = false;
+    }, 5000); 
+  }
+ 
 };
 
 const closeModal = () => {
