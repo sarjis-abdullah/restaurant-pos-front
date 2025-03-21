@@ -22,7 +22,7 @@
                   <td class="whitespace-nowrap px-3 py-5 text-sm text-gray-900">{{ branch.company_id }}</td>
                   <td class="flex justify-center gap-1 relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                     <TrashIcon
-                      @click="deleteBranch(branch)"
+                      @click="openDeleteModal(branch.id)"
                       class="h-5 w-5 text-red-500 cursor-pointer"
                       aria-hidden="true"
                     />
@@ -57,6 +57,8 @@
       @onChange="onPageChanged"
     />
     <Loading v-if="isLoading || deleting" />
+    <!-- Global Delete Modal -->
+    <DeleteModal :isOpen="showDeleteModal" @confirm="confirmDelete" @close="closeDeleteModal" />
   </div>
 </template>
 
@@ -68,7 +70,7 @@ import Pagination from "@/components/common/Pagination.vue";
 import Loading from "@/components/common/Loading.vue";
 import ServerError from "@/components/common/Error.vue";
 import { TrashIcon } from "@heroicons/vue/20/solid";
-
+import DeleteModal from "~/components/DeleteModal.vue";
 // Page meta
 definePageMeta({
   layout: "auth-layout",
@@ -80,6 +82,7 @@ const loading = ref(true);
 const loadingError = ref(false);
 const message = ref("");
 const deleting = ref(false);
+const serverErrors = ref({}); // Declare the serverErrors variable here
 
 // Pagination
 const page = ref(1);
@@ -115,34 +118,42 @@ async function fetchBranches() {
   loading.value = false;
 }
 
-async function deleteBranch(branch) {
-  if (deleting.value) return;
-  if (!confirm("Are you sure you want to delete this branch?")) return;
+// Delete Modal Logic
+const showDeleteModal = ref(false);
+const selectedItemId = ref(null);
 
-  deleting.value = true;
-  try {
-    await BranchService.delete(branch.id);
-    fetchBranches(); // Re-fetch branches to ensure consistency
-    message.value = "Branch deleted successfully!";
-    // setTimeout(() => {
-    //   message.value = ""; // Reset message after 3 seconds
-    // }, 3000);
-  } catch (err) {
-    console.error("Error deleting branch:", err);
-    message.value = "Failed to delete branch.";
-    // setTimeout(() => {
-    //   message.value = ""; // Reset message after 3 seconds
-    // }, 3000);
-  } finally {
-    deleting.value = false;
+const openDeleteModal = (id) => {
+  selectedItemId.value = id;
+  showDeleteModal.value = true;
+};
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false;
+  selectedItemId.value = null;
+};
+
+const confirmDelete = async () => {
+  if (selectedItemId.value) {
+    try {
+      deleting.value = true;
+      await BranchService.delete(selectedItemId.value); // Use the BranchService for deleting
+      branches.value = branches.value.filter((item) => item.id !== selectedItemId.value);
+      serverErrors.value = {}; // Clear server errors after successful deletion
+    } catch (error) {
+      serverErrors.value = error.errors || {}; // Set server errors if the delete fails
+    } finally {
+      deleting.value = false;
+      closeDeleteModal();
+    }
   }
-}
+};
 
 const onPageChanged = (p) => {
   page.value = p;
   fetchBranches();
 };
 </script>
+
 
 <style scoped>
 button:hover {

@@ -101,6 +101,15 @@ export const useMenu = () => {
         ],
       },
       {
+        name: "Company",
+        href: "/branch",
+        show: false,
+        children: [
+          { name: "Add", href: "/add/company", icon: PlusIcon },
+          { name: "List", href: "/company", icon: TableCellsIcon },
+        ],
+      },
+      {
         name: "Category",
         href: "/category",
         show: false,
