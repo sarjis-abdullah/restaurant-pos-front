@@ -13,7 +13,7 @@
         </div>
         <div class="grid gap-2">
           <label class="text-gray-500">Company ID<span class="text-red-500">*</span></label>
-          <BaseInput v-model="branch.company_id" type="number" placeholder="Company ID" />
+          <SelectSupplier v-model="branch.company_id" :options="companyIdOptions" />
         </div>
         <div class="grid gap-2">
           <label class="text-gray-500">Type<span class="text-red-500">*</span></label>
@@ -45,8 +45,28 @@ import ServerError from "@/components/common/Error.vue";
 import { useToast } from "vue-toastification";
 import { BranchService } from "@/services/BranchService";
 import SelectSupplier from "~/components/branch/SelectSupplier.vue"; // Importing SelectSupplier
+import { CompanyService } from "@/services/CompanyService";
 
 definePageMeta({ layout: "auth-layout" });
+const companyIdOptions = ref([]); // ✅ Added this
+const fetchCompanies = async () => {
+  try {
+    const response = await CompanyService.getAll();
+    if (response && response.data) {
+      companyIdOptions.value = response.data.map(company => ({
+        id: company.id,
+        name: company.name,
+      }));
+    }
+  } catch (error) {
+    console.error("Failed to fetch companies", error);
+    toast.error("Failed to load company list.");
+  }
+};
+onMounted(() => {
+  fetchBranches();  // ✅ Existing function call
+  fetchCompanies(); // ✅ Now also fetching company list
+});
 
 const toast = useToast();
 const serverErrors = ref({});
