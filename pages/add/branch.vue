@@ -1,5 +1,5 @@
 <template>
-  <section class="rounded-lg  shadow-lg p-6">
+  <section class="rounded-lg shadow-lg p-6">
     <header class="hidden md:flex justify-between text-gray-900 mb-3 text-xl">
       <h6 class="hidden md:inline-block capitalize">Add Branches</h6>
     </header>
@@ -17,7 +17,7 @@
         </div>
         <div class="grid gap-2">
           <label class="text-gray-500">Type<span class="text-red-500">*</span></label>
-          <BaseInput v-model="branch.type" placeholder="Branch Type" />
+          <SelectSupplier v-model="branch.type" :options="branchTypeOptions" />
         </div>
       </section>
 
@@ -31,8 +31,6 @@
         <SpinnerButton type="submit" :loading="loading">Create Branch</SpinnerButton>
       </section>
     </form>
-
-    
   </section>
 </template>
 
@@ -45,9 +43,8 @@ import SpinnerButton from "@/components/common/SpinnerButton.vue";
 import ClientErrors from "@/components/common/ClientErrors.vue";
 import ServerError from "@/components/common/Error.vue";
 import { useToast } from "vue-toastification";
-import { BranchService } from "@/services/BranchService"; // Import BranchService
-import SelectBranch from "~/components/branch/SelectBranch.vue";
-// import SelectBranchType from "~/components/branch/SelectBranchType.vue";
+import { BranchService } from "@/services/BranchService";
+import SelectSupplier from "~/components/branch/SelectSupplier.vue"; // Importing SelectSupplier
 
 definePageMeta({ layout: "auth-layout" });
 
@@ -61,6 +58,15 @@ const branch = reactive({
   company_id: null,
   type: "",
 });
+
+// Predefined branch type options
+const branchTypeOptions = ref([
+  { id: "single", name: "single" },
+  { id: "multiple", name: "multiple" },
+  { id: "warehouse", name: "warehouse" },
+  { id: "generic", name: "generic" },
+]);
+
 
 // Form validation rules
 const rules = computed(() => ({
@@ -109,18 +115,7 @@ const createBranch = async () => {
   }
 };
 
-// Delete branch
-const deleteBranch = async (id) => {
-  if (!confirm("Are you sure you want to delete this branch?")) return;
-  try {
-    await BranchService.delete(id);
-    toast.success("Branch deleted successfully!");
-    fetchBranches(); // Refresh list
-  } catch (error) {
-    toast.error("Failed to delete branch.");
-  }
-};
-
 // Fetch branches on mount
 onMounted(fetchBranches);
+
 </script>
